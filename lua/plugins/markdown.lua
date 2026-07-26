@@ -27,15 +27,15 @@ return {
   },
 
   -- ============================================================
-  -- Preview trên trình duyệt (live, cuộn đồng bộ). Binary tự tải khi build.
+  -- Preview trên trình duyệt (live, cuộn đồng bộ).
+  -- Chạy bằng node (yarn install) thay vì binary prebuilt — binary macOS
+  -- hay lỗi E903 "-88". Cần node + npx (yarn).
   -- ============================================================
   {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
     ft = { "markdown" },
-    build = function()
-      vim.fn["mkdp#util#install"]()
-    end,
+    build = "cd app && npx --yes yarn install",
     keys = {
       { "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>", ft = "markdown", desc = "Preview markdown (trình duyệt)" },
     },
