@@ -113,7 +113,10 @@ Server tự cài qua `:Mason`. Đã có: Lua, JS/TS, HTML/CSS, Tailwind, JSON, Y
 | `Space c d` | Danh sách diagnostic (Telescope) |
 
 - Quản lý server: `:Mason` (cài/gỡ). Xem trạng thái LSP: `:checkhealth lsp`.
-- Java: chỉ ở mức cơ bản (điều hướng/hover); Spring nặng nên dùng IDE chính.
+- **Java / Spring**: qua `nvim-jdtls` (chạy bằng Java 21), cấu hình trong
+  `lua/plugins/java.lua`. Lần đầu mở file `.java` jdtls sẽ **import project
+  (Maven/Gradle) — mất ~1-2 phút** tải sources/dependencies; sau đó `gd`/`K`/`gr`
+  hoạt động bình thường. Đổi đường dẫn JDK trong file đó nếu máy khác.
 
 ### Markdown
 

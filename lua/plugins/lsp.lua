@@ -39,7 +39,8 @@ return {
         jsonls = {},
         yamlls = {},
         bashls = {},
-        jdtls = {}, -- Java (cơ bản; Spring nặng nên dùng IDE chính)
+        -- Java: KHÔNG setup ở đây (jdtls cần plugin riêng nvim-jdtls).
+        -- Xem lua/plugins/java.lua.
       }
 
       require("mason-lspconfig").setup({
