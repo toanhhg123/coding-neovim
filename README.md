@@ -15,6 +15,7 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 - [x] Bước 1 — Bootstrap lazy.nvim + config cơ bản (options/keymaps/autocmds) — startup ~18ms
 - [~] Bước 2 — UI nền tảng: which-key + lualine + bufferline ✅ (colorscheme để sau)
 - [x] Bước 3 — Search & Navigation (Telescope + fzf-native) ✅
+- [x] Bước 4 — Treesitter (highlight + textobjects) ✅
 - [x] Bước 5 — Git (gitsigns + diffview) ✅
 - [x] Bước 6 — AI CLI (toggleterm: claude/codex, nhiều session, gửi context) ✅
 - [x] Bước 7 — tmux (vim-tmux-navigator + config mới + sessionizer BE/FE/job) ✅
@@ -65,6 +66,21 @@ cướp focus khỏi Neovim), thêm **cột mới bên phải, cạnh nhau** (fu
 - Bề rộng cột AI ~40%, đổi ở `M.width_ratio` trong `lua/util/ai.lua`.
 - File do AI sửa trên đĩa → Neovim **tự nạp lại** (autoread + focus-events).
 - Gửi context **không tự submit** — bạn xem/sửa rồi tự Enter.
+
+### Đọc code (Treesitter)
+
+Highlight chính xác theo cây cú pháp cho JS/TS, Java, HTML/CSS, JSON/YAML... (25 parser).
+
+| Phím | Chức năng |
+|---|---|
+| `Ctrl-Space` | Mở rộng vùng chọn theo cú pháp (bấm tiếp để rộng thêm) · `BS` thu lại |
+| `af` / `if` | Chọn cả hàm / thân hàm |
+| `ac` / `ic` | Chọn cả class / thân class |
+| `aa` / `ia` | Chọn tham số |
+| `]f` / `[f` | Nhảy hàm kế tiếp / trước |
+| `]t` / `[t` | Nhảy class kế tiếp / trước |
+
+> `af`/`if`/`ac`/`ic`/`aa` dùng kèm toán tử: `daf` xoá cả hàm, `vic` chọn thân class, `cia` sửa tham số...
 
 ### Git
 
