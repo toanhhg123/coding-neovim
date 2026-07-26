@@ -16,6 +16,8 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 - [x] Bước 2 — UI nền tảng: which-key + lualine + bufferline + colorscheme (Tokyonight, trong suốt) ✅
 - [x] Bước 3 — Search & Navigation (Telescope + fzf-native) ✅
 - [x] Bước 4 — Treesitter (highlight + textobjects) ✅
+- [x] Bước 8 — LSP tối giản (mason + lspconfig, navigation-focused) ✅
+- [x] Extra — File explorer (neo-tree) · Markdown preview ✅
 - [x] Bước 5 — Git (gitsigns + diffview) ✅
 - [x] Bước 6 — AI CLI (toggleterm: claude/codex, nhiều session, gửi context) ✅
 - [x] Bước 7 — tmux (vim-tmux-navigator + config mới + sessionizer BE/FE/job) ✅
@@ -91,6 +93,27 @@ Highlight chính xác theo cây cú pháp cho JS/TS, Java, HTML/CSS, JSON/YAML..
 | `]t` / `[t` | Nhảy class kế tiếp / trước |
 
 > `af`/`if`/`ac`/`ic`/`aa` dùng kèm toán tử: `daf` xoá cả hàm, `vic` chọn thân class, `cia` sửa tham số...
+
+### LSP (điều hướng & hiểu code)
+
+Tối giản, tập trung **đọc/hiểu code** — không format-on-save, không ép lint.
+Server tự cài qua `:Mason`. Đã có: Lua, JS/TS, HTML/CSS, Tailwind, JSON, YAML, Bash, Java (cơ bản).
+
+| Phím | Chức năng |
+|---|---|
+| `gd` | Nhảy tới **định nghĩa** (Telescope) |
+| `gr` | **References** (nơi dùng) |
+| `gi` / `gy` | Implementations / Type definition |
+| `K` | **Hover** — xem type/doc |
+| `gl` | Xem diagnostic dòng hiện tại |
+| `]d` / `[d` | Diagnostic kế tiếp / trước |
+| `Space r n` | Đổi tên (rename) toàn bộ |
+| `Space c a` | Code action (sửa nhanh) |
+| `Space c f` | Format (thủ công, không tự động) |
+| `Space c d` | Danh sách diagnostic (Telescope) |
+
+- Quản lý server: `:Mason` (cài/gỡ). Xem trạng thái LSP: `:checkhealth lsp`.
+- Java: chỉ ở mức cơ bản (điều hướng/hover); Spring nặng nên dùng IDE chính.
 
 ### Markdown
 

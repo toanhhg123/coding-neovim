@@ -148,9 +148,9 @@ Chúng ta build **tăng dần**, mỗi bước chạy được & commit riêng:
 - [x] **Bước 5** — Git (gitsigns + diffview)
 - [x] **Bước 6** — AI CLI (toggleterm + claude/codex, nhiều session) + auto-reload
 - [x] **Bước 7** — tmux navigator + config tmux + sessionizer BE/FE/job
-- [ ] **Bước 8** — LSP tối giản (navigation-focused), chỉ khi cần
-- [x] colorscheme (Tokyonight trong suốt) + file explorer (neo-tree)
-- [ ] còn lại — LSP tối giản, (tùy chọn) avante inline, trouble
+- [x] **Bước 8** — LSP tối giản (mason + lspconfig, navigation-focused)
+- [x] colorscheme (Tokyonight trong suốt) + file explorer (neo-tree) + markdown preview
+- [ ] còn lại (tùy chọn) — completion (blink/cmp), avante inline, trouble, nvim-jdtls cho Java
 
 ---
 
