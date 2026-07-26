@@ -82,6 +82,15 @@ Highlight chính xác theo cây cú pháp cho JS/TS, Java, HTML/CSS, JSON/YAML..
 
 > `af`/`if`/`ac`/`ic`/`aa` dùng kèm toán tử: `daf` xoá cả hàm, `vic` chọn thân class, `cia` sửa tham số...
 
+### Markdown
+
+| Phím (trong file `.md`) | Chức năng |
+|---|---|
+| `Space m r` | Render markdown **trong editor** (bật/tắt) — heading, bảng, code, checkbox |
+| `Space m p` | Preview trên **trình duyệt** (live, cuộn đồng bộ) |
+
+> render-markdown bật sẵn khi mở file `.md`. markdown-preview tải binary khi cài lần đầu.
+
 ### Git
 
 | Phím | Chức năng |

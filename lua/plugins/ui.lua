@@ -21,6 +21,7 @@ return {
         { "<leader>a", group = "AI CLI" },
         { "<leader>b", group = "Buffer" },
         { "<leader>e", group = "Explorer" },
+        { "<leader>m", group = "Markdown" },
         { "<leader>L", desc = "Lazy (quản lý plugin)" },
         { "<leader>w", desc = "Lưu file" },
         { "<leader>/", desc = "Tìm trong file hiện tại" },
