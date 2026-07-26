@@ -15,7 +15,24 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 - [x] Bước 1 — Bootstrap lazy.nvim + config cơ bản (options/keymaps/autocmds) — startup ~18ms
 - [~] Bước 2 — UI nền tảng: which-key + lualine + bufferline ✅ (colorscheme để sau)
 - [x] Bước 3 — Search & Navigation (Telescope + fzf-native) ✅
+- [x] Bước 5 — Git (gitsigns + diffview) ✅
 - [ ] ... (xem DESIGN.md §7)
+
+### Git
+
+| Phím | Chức năng |
+|---|---|
+| `]c` / `[c` | Nhảy tới hunk (thay đổi) kế tiếp / trước |
+| `Space g p` | Xem trước thay đổi của hunk |
+| `Space g s` / `Space g r` | Stage / bỏ thay đổi hunk (dùng được ở visual) |
+| `Space g S` | Stage cả file · `Space g u` undo stage |
+| `Space g b` | Bật/tắt blame theo dòng · `Space g B` blame chi tiết |
+| `Space g d` | **Diff các thay đổi chưa commit** |
+| `Space g D` | Diff so với base branch (`origin/HEAD...HEAD`) |
+| `Space g h` / `Space g H` | Lịch sử file hiện tại / toàn repo |
+| `Space g c` | Đóng diffview |
+
+Trong diffview: `Tab`/`Shift-Tab` chuyển file, `]c`/`[c` nhảy hunk, `q` để đóng.
 
 ### Phím search (Telescope)
 
