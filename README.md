@@ -57,6 +57,7 @@ Chạy AI CLI ngay trong Neovim. Giữ session (tiến trình vẫn chạy khi �
 | `Space a ?` | Xem bảng phím thao tác AI |
 | `Space a t` / `Space a T` | Terminal thường (float / dưới) — chạy test/build |
 
+- AI mở dạng **cửa sổ split dọc sát trái** (~40% bề rộng, đổi ở `M.width_ratio` trong `lua/util/ai.lua`).
 - Trong cửa sổ AI: `<C-q>` ẩn nhanh (giữ session), `<Esc><Esc>` về normal mode.
 - File do AI sửa trên đĩa → Neovim **tự nạp lại** (autoread).
 - Gửi context **không tự submit** — bạn xem/sửa rồi tự Enter.

@@ -19,12 +19,11 @@ M.named = {
   gemini = { cmd = "gemini", count = 193, label = "Gemini" },
 }
 
-local function float_opts()
-  return {
-    border = "curved",
-    width = math.floor(vim.o.columns * 0.85),
-    height = math.floor(vim.o.lines * 0.85),
-  }
+-- Bề rộng cửa sổ AI = tỉ lệ cột màn hình (đổi ở đây nếu muốn rộng/hẹp hơn)
+M.width_ratio = 0.40
+
+local function ai_width()
+  return math.max(60, math.floor(vim.o.columns * M.width_ratio))
 end
 
 -- CLI đã cài chưa? (báo nhẹ nếu thiếu, không làm vỡ config)
@@ -46,13 +45,15 @@ function M.get(key, cmd, count, label)
   local term = Terminal:new({
     cmd = cmd,
     count = count,
-    direction = "float",
-    float_opts = float_opts(),
+    direction = "vertical", -- split dọc (không phải float)
+    size = ai_width(),
     close_on_exit = false, -- giữ cửa sổ khi CLI thoát -> đọc được output cuối
     hidden = true,
     display_name = label or key,
     on_open = function(t)
       M._last = t
+      vim.cmd("wincmd H") -- đẩy cửa sổ AI sang sát TRÁI, full chiều cao
+      vim.cmd("vertical resize " .. ai_width())
       vim.cmd("startinsert")
       -- Trong terminal AI: <C-q> để ẩn nhanh (giữ session)
       vim.keymap.set("t", "<C-q>", function()
