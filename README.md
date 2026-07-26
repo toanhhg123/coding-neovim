@@ -12,7 +12,7 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 🚧 **Đang xây dựng** — build tăng dần theo lộ trình trong DESIGN.md.
 
 - [x] Bước 0 — Khởi tạo repo & tài liệu
-- [ ] Bước 1 — Bootstrap lazy.nvim + config cơ bản
+- [x] Bước 1 — Bootstrap lazy.nvim + config cơ bản (options/keymaps/autocmds) — startup ~18ms
 - [ ] Bước 2 — UI nền tảng (colorscheme, which-key, statusline)
 - [ ] Bước 3 — Search & Navigation
 - [ ] ... (xem DESIGN.md §7)
