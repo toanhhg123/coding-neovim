@@ -25,6 +25,8 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 Config tmux được version-control trong repo (`tmux/`), symlink tới `~/.config/tmux/tmux.conf`.
 Prefix mặc định: **`Ctrl-t`**.
 
+> 📖 Phím tắt tmux đầy đủ: [tmux/KEYBINDINGS.md](tmux/KEYBINDINGS.md)
+
 | Phím | Chức năng |
 |---|---|
 | `Ctrl-h/j/k/l` | Nhảy liền mạch giữa **Neovim split ↔ tmux pane** |
