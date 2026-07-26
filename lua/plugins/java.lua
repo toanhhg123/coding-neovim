@@ -37,6 +37,11 @@ return {
       end
 
       local function start()
+        -- Tôn trọng trạng thái bật/tắt toàn bộ LSP (:LspDisable)
+        local ok_toggle, toggle = pcall(require, "util.lsp")
+        if ok_toggle and not toggle.enabled then
+          return
+        end
         local root = vim.fs.root(0, { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" })
         if not root then
           return

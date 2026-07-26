@@ -46,6 +46,9 @@ map("v", ">", ">gv", { desc = "Thụt phải, giữ chọn" })
 -- === Terminal: về normal mode dễ hơn ===
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Terminal -> normal mode" })
 
+-- === LSP: bật/tắt toàn bộ ===
+map("n", "<leader>cl", function() require("util.lsp").toggle() end, { desc = "LSP: bật/tắt toàn bộ" })
+
 -- === AI CLI (mở dạng tmux pane bên phải — xem lua/util/ai.lua) ===
 local function ai()
   return require("util.ai")
