@@ -67,6 +67,16 @@ cướp focus khỏi Neovim), thêm **cột mới bên phải, cạnh nhau** (fu
 - File do AI sửa trên đĩa → Neovim **tự nạp lại** (autoread + focus-events).
 - Gửi context **không tự submit** — bạn xem/sửa rồi tự Enter.
 
+### File explorer (neo-tree)
+
+| Phím | Chức năng |
+|---|---|
+| `Space e` | Bật/tắt cây thư mục (tự hiện file đang mở) |
+| `Space E` | Hiện (reveal) file hiện tại trong cây |
+| `Space g e` | Xem git status dạng cây (float) |
+
+Trong cây: `l`/`Enter` mở · `h` đóng nhánh · `P` xem preview · `a` thêm · `d` xoá · `r` đổi tên · `?` xem toàn bộ phím.
+
 ### Đọc code (Treesitter)
 
 Highlight chính xác theo cây cú pháp cho JS/TS, Java, HTML/CSS, JSON/YAML... (25 parser).

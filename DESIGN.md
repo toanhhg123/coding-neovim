@@ -149,7 +149,8 @@ Chúng ta build **tăng dần**, mỗi bước chạy được & commit riêng:
 - [x] **Bước 6** — AI CLI (toggleterm + claude/codex, nhiều session) + auto-reload
 - [x] **Bước 7** — tmux navigator + config tmux + sessionizer BE/FE/job
 - [ ] **Bước 8** — LSP tối giản (navigation-focused), chỉ khi cần
-- [ ] còn lại — colorscheme, file explorer, (tùy chọn) avante inline, trouble
+- [x] colorscheme (Tokyonight trong suốt) + file explorer (neo-tree)
+- [ ] còn lại — LSP tối giản, (tùy chọn) avante inline, trouble
 
 ---
 
