@@ -16,7 +16,30 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 - [~] Bước 2 — UI nền tảng: which-key + lualine + bufferline ✅ (colorscheme để sau)
 - [x] Bước 3 — Search & Navigation (Telescope + fzf-native) ✅
 - [x] Bước 5 — Git (gitsigns + diffview) ✅
+- [x] Bước 6 — AI CLI (toggleterm: claude/codex, nhiều session, gửi context) ✅
 - [ ] ... (xem DESIGN.md §7)
+
+### AI CLI
+
+Chạy AI CLI ngay trong Neovim. Giữ session (tiến trình vẫn chạy khi ẩn cửa sổ).
+
+| Phím | Chức năng |
+|---|---|
+| `Ctrl-\` | Bật/tắt terminal nhanh (mọi chế độ) |
+| `Space a c` | Claude · `Space a x` Codex · `Space a g` Gemini |
+| `Space a C` | Claude: **tiếp tục session trước** (`--continue`) |
+| `Space a n` | **Mở session AI mới** (chạy nhiều song song) |
+| `Space a s` | Chọn / chuyển giữa các session đang mở |
+| `Space a f` | Gửi file hiện tại (`@path`) sang AI |
+| `Space a l` | Gửi `@path:dòng` hiện tại |
+| `Space a v` | (visual) Gửi vùng chọn `@path:range` |
+| `Space a r` | **Xem AI vừa update gì** (mở diff) |
+| `Space a ?` | Xem bảng phím thao tác AI |
+| `Space a t` / `Space a T` | Terminal thường (float / dưới) — chạy test/build |
+
+- Trong cửa sổ AI: `<C-q>` ẩn nhanh (giữ session), `<Esc><Esc>` về normal mode.
+- File do AI sửa trên đĩa → Neovim **tự nạp lại** (autoread).
+- Gửi context **không tự submit** — bạn xem/sửa rồi tự Enter.
 
 ### Git
 
