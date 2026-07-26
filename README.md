@@ -17,7 +17,27 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 - [x] Bước 3 — Search & Navigation (Telescope + fzf-native) ✅
 - [x] Bước 5 — Git (gitsigns + diffview) ✅
 - [x] Bước 6 — AI CLI (toggleterm: claude/codex, nhiều session, gửi context) ✅
+- [x] Bước 7 — tmux (vim-tmux-navigator + config mới + sessionizer BE/FE/job) ✅
 - [ ] ... (xem DESIGN.md §7)
+
+### tmux
+
+Config tmux được version-control trong repo (`tmux/`), symlink tới `~/.config/tmux/tmux.conf`.
+Prefix mặc định: **`Ctrl-t`**.
+
+| Phím | Chức năng |
+|---|---|
+| `Ctrl-h/j/k/l` | Nhảy liền mạch giữa **Neovim split ↔ tmux pane** |
+| `Ctrl-f` hoặc `prefix f` | **Sessionizer**: fzf chọn project → tạo/switch session (BE/FE/job) |
+| `prefix s` | Danh sách session đang có |
+| `prefix \|` / `prefix -` | Split dọc / ngang (mở ở đúng thư mục hiện tại) |
+| `prefix h/j/k/l` | Resize pane · `prefix m` zoom pane |
+| `prefix r` | Reload config |
+
+- **Session bền**: tmux-resurrect + continuum tự lưu mỗi 15' và khôi phục khi mở lại.
+- **Sessionizer** tìm project trong `~/develop ~/projects ~/work ~/code`
+  (đổi bằng biến `TMUX_SESSIONIZER_PATHS`). Cần `fzf` (+ `fd` nếu có).
+- Đã bật `focus-events` (Neovim autoread trong tmux) + true color.
 
 ### AI CLI
 
@@ -101,6 +121,8 @@ Sẽ được bổ sung dần khi build. Dự kiến:
 | `fd` | Tìm file | `brew install fd` |
 | Nerd Font | Icon | https://www.nerdfonts.com |
 | `git` | Git integration | — |
+| `tmux` ≥ 3.3 | Session BE/FE/job | `brew install tmux` |
+| `fzf` | Sessionizer | `brew install fzf` |
 | `node` | Một số LSP | — |
 | `claude` / `codex` CLI | AI trong session | theo hướng dẫn từng tool |
 

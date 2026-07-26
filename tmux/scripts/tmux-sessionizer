@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# tmux-sessionizer — nhảy nhanh giữa các project/session (BE / FE / job)
+# Chọn 1 thư mục project bằng fzf -> tạo (hoặc switch) tmux session cùng tên.
+# Bind: prefix + f  hoặc  Ctrl-f  (xem tmux.conf)
+
+# Các thư mục gốc chứa project. Sửa danh sách này cho hợp máy bạn.
+# Có thể override bằng biến môi trường: TMUX_SESSIONIZER_PATHS="~/a ~/b"
+ROOTS=(
+  "$HOME/develop"
+  "$HOME/projects"
+  "$HOME/work"
+  "$HOME/code"
+)
+if [ -n "$TMUX_SESSIONIZER_PATHS" ]; then
+  # shellcheck disable=SC2206
+  ROOTS=($TMUX_SESSIONIZER_PATHS)
+fi
+
+# 1) Nếu truyền sẵn đường dẫn -> dùng luôn. Ngược lại fzf để chọn.
+if [[ $# -eq 1 ]]; then
+  selected=$1
+else
+  # Chỉ lấy các root tồn tại
+  existing=()
+  for r in "${ROOTS[@]}"; do [ -d "$r" ] && existing+=("$r"); done
+  [ ${#existing[@]} -eq 0 ] && { tmux display-message "sessionizer: không có thư mục gốc nào tồn tại"; exit 0; }
+
+  if command -v fd >/dev/null 2>&1; then
+    selected=$(fd . "${existing[@]}" --min-depth 1 --max-depth 1 --type d 2>/dev/null | fzf --prompt="project> ")
+  else
+    selected=$(find "${existing[@]}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | fzf --prompt="project> ")
+  fi
+fi
+
+# Không chọn gì -> thoát êm
+[[ -z $selected ]] && exit 0
+
+# 2) Tên session = tên thư mục, bỏ ký tự lạ (. và : không hợp lệ trong tên tmux)
+selected_name=$(basename "$selected" | tr '.:' '__')
+tmux_running=$(pgrep tmux)
+
+# 3a) Chưa có server tmux nào & không ở trong tmux -> tạo mới rồi attach
+if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+  tmux new-session -s "$selected_name" -c "$selected"
+  exit 0
+fi
+
+# 3b) Session chưa tồn tại -> tạo (detached)
+if ! tmux has-session -t="$selected_name" 2>/dev/null; then
+  tmux new-session -ds "$selected_name" -c "$selected"
+fi
+
+# 4) Switch tới session đó (dù đang ở trong hay ngoài tmux)
+if [[ -z $TMUX ]]; then
+  tmux attach-session -t "$selected_name"
+else
+  tmux switch-client -t "$selected_name"
+fi

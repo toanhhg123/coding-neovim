@@ -11,12 +11,9 @@ map("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Xoá highlight tìm kiếm" }
 -- Lưu file nhanh
 map("n", "<leader>w", "<cmd>write<CR>", { desc = "Lưu file" })
 
--- === Di chuyển giữa các split (fallback khi CHƯA có tmux-navigator) ===
--- Khi thêm vim-tmux-navigator (Bước 7), plugin sẽ override để nhảy cả sang tmux pane.
-map("n", "<C-h>", "<C-w>h", { desc = "Sang split trái" })
-map("n", "<C-j>", "<C-w>j", { desc = "Xuống split dưới" })
-map("n", "<C-k>", "<C-w>k", { desc = "Lên split trên" })
-map("n", "<C-l>", "<C-w>l", { desc = "Sang split phải" })
+-- === Di chuyển giữa split & tmux pane ===
+-- Ctrl-h/j/k/l do vim-tmux-navigator đảm nhận (xem lua/plugins/tmux.lua)
+-- -> nhảy liền mạch cả trong Neovim lẫn sang tmux pane.
 
 -- Resize split bằng phím mũi tên
 map("n", "<C-Up>", "<cmd>resize +2<CR>", { desc = "Tăng chiều cao split" })

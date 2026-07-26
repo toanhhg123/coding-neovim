@@ -96,7 +96,9 @@ Neovim ở đây đóng vai trò một **"code cockpit" nhẹ, di động**:
 ### 4.5 tmux integration (giữa các session)
 - **`vim-tmux-navigator`**: dùng `Ctrl-h/j/k/l` để nhảy liền mạch giữa
   **Neovim split** và **tmux pane** — không phân biệt ranh giới.
-- Gợi ý workflow tmux (cấu hình phía tmux, ngoài repo này nhưng sẽ ghi chú trong README):
+- Config tmux được version-control trong repo tại `tmux/` (symlink tới
+  `~/.config/tmux/tmux.conf`), kèm script `tmux/scripts/tmux-sessionizer`.
+- Gợi ý workflow tmux:
   - Mỗi **project/ngữ cảnh** = 1 tmux session (`be`, `fe`, `job`).
   - Dùng `tmux switch-client` / `sessionizer` (fzf) để nhảy giữa BE/FE/job trong 1-2 phím.
   - Trong mỗi session: pane trái = Neovim, pane phải = AI CLI / logs / test.
@@ -138,16 +140,16 @@ Neovim ở đây đóng vai trò một **"code cockpit" nhẹ, di động**:
 
 Chúng ta build **tăng dần**, mỗi bước chạy được & commit riêng:
 
-- [ ] **Bước 0** — Khởi tạo repo, DESIGN.md, README skeleton *(đang làm)*
-- [ ] **Bước 1** — `init.lua` + bootstrap lazy.nvim + `options`/`keymaps`/`autocmds` cơ bản
-- [ ] **Bước 2** — Colorscheme + which-key + statusline (nền tảng UI, nhẹ)
-- [ ] **Bước 3** — Search & Navigation (telescope + flash + file explorer) ← trọng tâm
+- [x] **Bước 0** — Khởi tạo repo, DESIGN.md, README skeleton
+- [x] **Bước 1** — `init.lua` + bootstrap lazy.nvim + `options`/`keymaps`/`autocmds` cơ bản
+- [~] **Bước 2** — which-key + lualine + bufferline (còn colorscheme)
+- [x] **Bước 3** — Search & Navigation (telescope + fzf-native) ← trọng tâm
 - [ ] **Bước 4** — Treesitter (đọc code đẹp)
-- [ ] **Bước 5** — Git (gitsigns + diffview)
-- [ ] **Bước 6** — AI CLI (toggleterm + claude/codex) + auto-reload
-- [ ] **Bước 7** — tmux navigator + ghi chú cấu hình tmux (sessionizer BE/FE/job)
+- [x] **Bước 5** — Git (gitsigns + diffview)
+- [x] **Bước 6** — AI CLI (toggleterm + claude/codex, nhiều session) + auto-reload
+- [x] **Bước 7** — tmux navigator + config tmux + sessionizer BE/FE/job
 - [ ] **Bước 8** — LSP tối giản (navigation-focused), chỉ khi cần
-- [ ] **Bước 9** — (tùy chọn) avante inline AI, trouble, các tinh chỉnh
+- [ ] còn lại — colorscheme, file explorer, (tùy chọn) avante inline, trouble
 
 ---
 
