@@ -14,8 +14,23 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 - [x] Bước 0 — Khởi tạo repo & tài liệu
 - [x] Bước 1 — Bootstrap lazy.nvim + config cơ bản (options/keymaps/autocmds) — startup ~18ms
 - [ ] Bước 2 — UI nền tảng (colorscheme, which-key, statusline)
-- [ ] Bước 3 — Search & Navigation
+- [x] Bước 3 — Search & Navigation (Telescope + fzf-native) ✅
 - [ ] ... (xem DESIGN.md §7)
+
+### Phím search (Telescope)
+
+| Phím | Chức năng |
+|---|---|
+| `<space><space>` / `<space>ff` | Tìm file |
+| `<space>fg` | **Grep từ khoá toàn project** |
+| `<space>fw` | Grep từ dưới con trỏ (hoặc vùng chọn) |
+| `<space>/` | Tìm trong file hiện tại |
+| `<space>fo` | File mở gần đây |
+| `<space>fb` | Danh sách buffer |
+| `<space>fr` | Mở lại kết quả tìm trước |
+| `<space>fk` | Tra cứu phím tắt |
+
+Trong ô tìm: `Ctrl-j/k` di chuyển, `Ctrl-q` gửi kết quả ra quickfix, `Esc` đóng.
 
 ---
 
