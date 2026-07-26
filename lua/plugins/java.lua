@@ -19,6 +19,11 @@ return {
       local launcher = vim.fn.glob(mason .. "/plugins/org.eclipse.equinox.launcher_*.jar")
       local config_dir = mason .. "/config_mac_arm" -- macOS Apple Silicon
 
+      -- Lombok: jdtls cần javaagent để hiểu code sinh tự động (getter/setter/builder).
+      -- Copy jar tới ~/.local/share/nvim/lombok.jar (xem README). Thiếu thì bỏ qua.
+      local lombok = vim.fn.stdpath("data") .. "/lombok.jar"
+      local has_lombok = vim.fn.filereadable(lombok) == 1
+
       -- Các JDK để jdtls biên dịch project (khai báo theo tên JavaSE-*)
       local runtimes = {}
       local candidates = {
@@ -39,22 +44,29 @@ return {
         -- Workspace riêng cho mỗi project (tránh lẫn dữ liệu)
         local ws = vim.fn.stdpath("cache") .. "/jdtls-workspace/" .. vim.fn.fnamemodify(root, ":p:h:t")
 
+        local cmd = {
+          java_bin,
+          "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+          "-Dosgi.bundles.defaultStartLevel=4",
+          "-Declipse.product=org.eclipse.jdt.ls.core.product",
+          "-Dlog.protocol=true",
+          "-Dlog.level=ALL",
+          "-Xmx1g",
+          "--add-modules=ALL-SYSTEM",
+          "--add-opens", "java.base/java.util=ALL-UNNAMED",
+          "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        }
+        if has_lombok then
+          table.insert(cmd, "-javaagent:" .. lombok) -- phải trước -jar
+        end
+        vim.list_extend(cmd, {
+          "-jar", launcher,
+          "-configuration", config_dir,
+          "-data", ws,
+        })
+
         require("jdtls").start_or_attach({
-          cmd = {
-            java_bin,
-            "-Declipse.application=org.eclipse.jdt.ls.core.id1",
-            "-Dosgi.bundles.defaultStartLevel=4",
-            "-Declipse.product=org.eclipse.jdt.ls.core.product",
-            "-Dlog.protocol=true",
-            "-Dlog.level=ALL",
-            "-Xmx1g",
-            "--add-modules=ALL-SYSTEM",
-            "--add-opens", "java.base/java.util=ALL-UNNAMED",
-            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-            "-jar", launcher,
-            "-configuration", config_dir,
-            "-data", ws,
-          },
+          cmd = cmd,
           root_dir = root,
           settings = {
             java = {

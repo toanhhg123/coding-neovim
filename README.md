@@ -117,6 +117,13 @@ Server tự cài qua `:Mason`. Đã có: Lua, JS/TS, HTML/CSS, Tailwind, JSON, Y
   `lua/plugins/java.lua`. Lần đầu mở file `.java` jdtls sẽ **import project
   (Maven/Gradle) — mất ~1-2 phút** tải sources/dependencies; sau đó `gd`/`K`/`gr`
   hoạt động bình thường. Đổi đường dẫn JDK trong file đó nếu máy khác.
+- **Lombok**: jdtls cần lombok.jar làm javaagent (hiểu getter/setter/builder sinh tự động).
+  Đặt jar tại `~/.local/share/nvim/lombok.jar`. Lấy nhanh từ maven cache:
+  ```bash
+  cp ~/.m2/repository/org/projectlombok/lombok/*/lombok-*.jar ~/.local/share/nvim/lombok.jar
+  # hoặc tải: curl -L https://projectlombok.org/downloads/lombok.jar -o ~/.local/share/nvim/lombok.jar
+  ```
+  Thiếu jar thì jdtls vẫn chạy, chỉ là không hiểu code Lombok.
 
 ### Markdown
 
