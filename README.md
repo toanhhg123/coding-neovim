@@ -42,7 +42,7 @@ Prefix mặc định: **`Ctrl-t`**.
 ### AI CLI
 
 AI CLI chạy dạng **tmux pane bên phải**. Mỗi lần bấm mở **1 pane mới** (không
-cướp focus khỏi Neovim). Pane đầu tạo cột phải, các pane sau xếp chồng trong cột đó.
+cướp focus khỏi Neovim), thêm **cột mới bên phải, cạnh nhau** (full-height).
 > ⚠️ Cần chạy Neovim **bên trong tmux**.
 
 | Phím | Chức năng |

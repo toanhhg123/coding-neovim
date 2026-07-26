@@ -82,8 +82,8 @@ function M.open(cmd, label)
   local anchor = M._panes[#M._panes]
   local args
   if anchor then
-    -- Đã có cột AI -> xếp chồng pane mới bên dưới cột đó
-    args = { "tmux", "split-window", "-v", "-d", "-t", anchor.id, "-c", cwd, "-P", "-F", "#{pane_id}", cmd }
+    -- Đã có cột AI -> thêm CỘT MỚI bên phải (side by side, full-height)
+    args = { "tmux", "split-window", "-h", "-d", "-t", anchor.id, "-c", cwd, "-P", "-F", "#{pane_id}", cmd }
   else
     -- Chưa có -> tạo cột AI full-height bên phải
     args = { "tmux", "split-window", "-h", "-f", "-d", "-l", width_pct(), "-c", cwd, "-P", "-F", "#{pane_id}", cmd }
