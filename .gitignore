@@ -1,0 +1,20 @@
+# Neovim runtime / state (không commit)
+lazy-lock.json.bak
+*.tmp
+*.swp
+*.swo
+
+# lazy.nvim state nếu vô tình nằm trong repo
+/lazy/
+/plugin/packer_compiled.lua
+
+# Local override (config riêng từng máy, không share)
+lua/config/local.lua
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
