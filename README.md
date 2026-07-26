@@ -29,7 +29,7 @@ Chạy AI CLI ngay trong Neovim. Giữ session (tiến trình vẫn chạy khi �
 | `Space a c` | Claude · `Space a x` Codex · `Space a g` Gemini |
 | `Space a C` | Claude: **tiếp tục session trước** (`--continue`) |
 | `Space a n` | **Mở session AI mới** (chạy nhiều song song) |
-| `Space a s` | Chọn / chuyển giữa các session đang mở |
+| `Space a s` | **Xem toàn bộ session** (mở/ẩn) + nhảy tới session chọn |
 | `Space a f` | Gửi file hiện tại (`@path`) sang AI |
 | `Space a l` | Gửi `@path:dòng` hiện tại |
 | `Space a v` | (visual) Gửi vùng chọn `@path:range` |

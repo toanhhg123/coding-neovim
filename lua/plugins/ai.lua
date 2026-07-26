@@ -20,7 +20,7 @@ return {
 
       -- --- Nhiều session ---
       { "<leader>an", function() ai().new_session() end, desc = "Mở session AI mới" },
-      { "<leader>as", function() ai().select() end, desc = "Chọn/chuyển session đang mở" },
+      { "<leader>as", function() ai().sessions() end, desc = "Xem TOÀN BỘ session (mở/ẩn) + nhảy tới" },
 
       -- --- Gửi context sang AI ---
       { "<leader>af", function() ai().send_file() end, desc = "Gửi file hiện tại (@path)" },

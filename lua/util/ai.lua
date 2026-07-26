@@ -111,10 +111,40 @@ function M.new_session()
   end)
 end
 
--- Chọn/chuyển giữa các session terminal đang mở
-function M.select()
-  vim.cmd("TermSelect")
+-- Xem TOÀN BỘ session: liệt kê mọi terminal (kể cả đang ẩn) + trạng thái,
+-- chọn 1 cái để nhảy tới. Đây là "trình xem toàn bộ session".
+function M.sessions()
+  local ok, mod = pcall(require, "toggleterm.terminal")
+  if not ok then
+    vim.notify("toggleterm chưa sẵn sàng", vim.log.levels.WARN)
+    return
+  end
+  local terms = mod.get_all(true) -- true = gồm cả terminal đang ẩn
+  if not terms or #terms == 0 then
+    vim.notify("Chưa có session nào đang chạy. Mở bằng <leader>ac / <leader>an", vim.log.levels.INFO, { title = "AI sessions" })
+    return
+  end
+  table.sort(terms, function(a, b)
+    return a.id < b.id
+  end)
+  vim.ui.select(terms, {
+    prompt = "Session đang chạy (" .. #terms .. "):",
+    format_item = function(t)
+      local name = t.display_name or (t.cmd and tostring(t.cmd)) or ("term " .. t.id)
+      local state = t:is_open() and "● mở " or "○ ẩn "
+      return string.format("%s [%d] %s", state, t.id, name)
+    end,
+  }, function(choice)
+    if not choice then
+      return
+    end
+    choice:open()
+    M._last = choice
+  end)
 end
+
+-- Giữ tên cũ để tương thích keymap; trỏ về trình xem session
+M.select = M.sessions
 
 -- === Gửi context vào session AI đang focus (không tự submit -> bạn tự sửa & Enter) ===
 local function insert_into_ai(text)
