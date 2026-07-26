@@ -13,7 +13,7 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 
 - [x] Bước 0 — Khởi tạo repo & tài liệu
 - [x] Bước 1 — Bootstrap lazy.nvim + config cơ bản (options/keymaps/autocmds) — startup ~18ms
-- [~] Bước 2 — UI nền tảng: which-key + lualine ✅ (colorscheme để sau)
+- [~] Bước 2 — UI nền tảng: which-key + lualine + bufferline ✅ (colorscheme để sau)
 - [x] Bước 3 — Search & Navigation (Telescope + fzf-native) ✅
 - [ ] ... (xem DESIGN.md §7)
 
@@ -37,6 +37,16 @@ Trong ô tìm: `Ctrl-j/k` di chuyển, `Ctrl-q` gửi kết quả ra quickfix, `
 - **which-key**: bấm `Space` rồi chờ ~0.3s → hiện bảng gợi ý phím theo nhóm (Find/Git/AI...).
   `Space ?` → xem phím tắt riêng của buffer hiện tại.
 - **lualine**: statusline hiện mode · nhánh git · diff · diagnostic · file · vị trí dòng:cột.
+- **bufferline**: thanh tab các file đang mở ở trên cùng.
+
+| Phím | Tab (file đang mở) |
+|---|---|
+| `Shift-h` / `Shift-l` | Tab trước / sau |
+| `Space 1..5` | Nhảy tới tab số 1..5 |
+| `Space b d` | Đóng tab hiện tại |
+| `Space b o` | Đóng các tab khác |
+| `Space b p` | Ghim/bỏ ghim tab |
+| `Space b h` / `Space b l` | Đóng tab bên trái / phải |
 
 ---
 

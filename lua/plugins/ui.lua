@@ -74,4 +74,47 @@ return {
       extensions = { "lazy", "quickfix" },
     },
   },
+
+  -- ============================================================
+  -- bufferline: thanh tab các file đang mở (trên cùng)
+  -- ============================================================
+  {
+    "akinsho/bufferline.nvim",
+    event = "VeryLazy",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    keys = {
+      { "<S-h>", "<cmd>BufferLineCyclePrev<CR>", desc = "Tab trước" },
+      { "<S-l>", "<cmd>BufferLineCycleNext<CR>", desc = "Tab sau" },
+      { "<leader>bp", "<cmd>BufferLineTogglePin<CR>", desc = "Ghim/bỏ ghim tab" },
+      { "<leader>bo", "<cmd>BufferLineCloseOthers<CR>", desc = "Đóng các tab khác" },
+      { "<leader>bl", "<cmd>BufferLineCloseRight<CR>", desc = "Đóng tab bên phải" },
+      { "<leader>bh", "<cmd>BufferLineCloseLeft<CR>", desc = "Đóng tab bên trái" },
+      { "<leader>bP", "<cmd>BufferLineGroupClose ungrouped<CR>", desc = "Đóng tab chưa ghim" },
+      -- Nhảy nhanh tới tab theo số thứ tự
+      { "<leader>1", "<cmd>BufferLineGoToBuffer 1<CR>", desc = "Tab 1" },
+      { "<leader>2", "<cmd>BufferLineGoToBuffer 2<CR>", desc = "Tab 2" },
+      { "<leader>3", "<cmd>BufferLineGoToBuffer 3<CR>", desc = "Tab 3" },
+      { "<leader>4", "<cmd>BufferLineGoToBuffer 4<CR>", desc = "Tab 4" },
+      { "<leader>5", "<cmd>BufferLineGoToBuffer 5<CR>", desc = "Tab 5" },
+    },
+    opts = {
+      options = {
+        mode = "buffers",              -- mỗi file mở = 1 tab
+        diagnostics = "nvim_lsp",       -- hiện dấu lỗi/cảnh báo trên tab
+        separator_style = "slant",
+        show_buffer_close_icons = true,
+        show_close_icon = false,
+        always_show_bufferline = false, -- ẩn khi chỉ có 1 file cho gọn
+        offsets = {
+          {
+            filetype = "neo-tree",
+            text = "Explorer",
+            highlight = "Directory",
+            separator = true,
+          },
+        },
+        hover = { enabled = true, delay = 200, reveal = { "close" } },
+      },
+    },
+  },
 }

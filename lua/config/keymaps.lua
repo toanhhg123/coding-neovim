@@ -25,9 +25,8 @@ map("n", "<C-Left>", "<cmd>vertical resize -2<CR>", { desc = "Giảm chiều r�
 map("n", "<C-Right>", "<cmd>vertical resize +2<CR>", { desc = "Tăng chiều rộng split" })
 
 -- === Buffer ===
-map("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Buffer trước" })
-map("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Buffer sau" })
-map("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Đóng buffer" })
+-- (S-h / S-l chuyển tab do bufferline đảm nhận — xem lua/plugins/ui.lua)
+map("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Đóng buffer/tab hiện tại" })
 
 -- === Di chuyển & chỉnh sửa tiện tay ===
 -- Giữ con trỏ giữa màn hình khi nhảy nửa trang / tìm kiếm
