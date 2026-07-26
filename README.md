@@ -13,7 +13,7 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 
 - [x] Bước 0 — Khởi tạo repo & tài liệu
 - [x] Bước 1 — Bootstrap lazy.nvim + config cơ bản (options/keymaps/autocmds) — startup ~18ms
-- [~] Bước 2 — UI nền tảng: which-key + lualine + bufferline ✅ (colorscheme để sau)
+- [x] Bước 2 — UI nền tảng: which-key + lualine + bufferline + colorscheme (Tokyonight, trong suốt) ✅
 - [x] Bước 3 — Search & Navigation (Telescope + fzf-native) ✅
 - [x] Bước 4 — Treesitter (highlight + textobjects) ✅
 - [x] Bước 5 — Git (gitsigns + diffview) ✅
@@ -124,6 +124,9 @@ Trong ô tìm: `Ctrl-j/k` di chuyển, `Ctrl-q` gửi kết quả ra quickfix, `
 
 ### UI
 
+- **Colorscheme**: Tokyonight, **nền trong suốt** (thấy nền iTerm phía sau). Đổi tông
+  ở `style` trong `lua/plugins/colorscheme.lua` (`night`/`storm`/`moon`/`day`).
+  Transparent áp dụng bền kể cả khi đổi sang colorscheme khác.
 - **which-key**: bấm `Space` rồi chờ ~0.3s → hiện bảng gợi ý phím theo nhóm (Find/Git/AI...).
   `Space ?` → xem phím tắt riêng của buffer hiện tại.
 - **lualine**: statusline hiện mode · nhánh git · diff · diagnostic · file · vị trí dòng:cột.
