@@ -52,7 +52,9 @@ function M.get(key, cmd, count, label)
     display_name = label or key,
     on_open = function(t)
       M._last = t
-      vim.cmd("wincmd H") -- đẩy cửa sổ AI sang sát TRÁI, full chiều cao
+      -- Đẩy cửa sổ AI sang sát PHẢI, full chiều cao.
+      -- Mở thêm session AI: mỗi cái thành 1 cột riêng, cột mới nằm ngoài cùng bên phải.
+      vim.cmd("wincmd L")
       vim.cmd("vertical resize " .. ai_width())
       vim.cmd("startinsert")
       -- Trong terminal AI: <C-q> để ẩn nhanh (giữ session)
