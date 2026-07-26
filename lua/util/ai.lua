@@ -1,204 +1,205 @@
--- lua/util/ai.lua — helper quản lý các session AI CLI (dựa trên toggleterm)
--- Tính năng: nhiều session, session bền (giữ tiến trình khi ẩn), gửi context,
--- chọn/chuyển session, review thay đổi AI.
+-- lua/util/ai.lua — mở AI CLI dạng TMUX PANE bên phải (nhiều session)
+-- Mỗi lần gọi mở 1 pane mới: pane đầu tạo cột phải, các pane sau xếp chồng
+-- trong cột đó. Điều hướng bằng Ctrl-hjkl (vim-tmux-navigator).
+-- Yêu cầu: Neovim chạy BÊN TRONG tmux.
 
 local M = {}
 
--- Cache các Terminal theo key -> giữ session (tiến trình vẫn chạy khi ẩn đi)
-M._terms = {}
--- Terminal AI được focus gần nhất (để gửi context vào đúng session)
-M._last = nil
--- Bộ đếm cho session tạo thêm (ad-hoc)
-M._counter = 300
+-- Bề rộng cột AI (theo % cửa sổ tmux). Đổi tại đây.
+M.width_ratio = 0.40
+-- Danh sách pane AI đang mở: { {id=, label=}, ... }
+M._panes = {}
+-- Pane AI mở/nhắm gần nhất (để gửi context)
+M._last_pane = nil
 
--- Cấu hình các AI đã biết. Thêm ở đây là có ngay keymap tương ứng.
--- count: id cố định của toggleterm -> mỗi AI 1 cửa sổ riêng.
+-- Các AI đã biết. Thêm ở đây là có keymap tương ứng.
 M.named = {
-  claude = { cmd = "claude", count = 191, label = "Claude" },
-  codex = { cmd = "codex", count = 192, label = "Codex" },
-  gemini = { cmd = "gemini", count = 193, label = "Gemini" },
+  claude = { cmd = "claude", label = "Claude" },
+  codex = { cmd = "codex", label = "Codex" },
+  gemini = { cmd = "gemini", label = "Gemini" },
 }
 
--- Bề rộng cửa sổ AI = tỉ lệ cột màn hình (đổi ở đây nếu muốn rộng/hẹp hơn)
-M.width_ratio = 0.40
-
-local function ai_width()
-  return math.max(60, math.floor(vim.o.columns * M.width_ratio))
+local function in_tmux()
+  return os.getenv("TMUX") ~= nil
 end
 
--- CLI đã cài chưa? (báo nhẹ nếu thiếu, không làm vỡ config)
-local function ensure(cmd)
-  local bin = cmd:match("^%S+")
-  if vim.fn.executable(bin) == 0 then
-    vim.notify("AI CLI chưa cài: " .. bin, vim.log.levels.WARN, { title = "AI" })
+local function executable(cmd)
+  return vim.fn.executable(cmd:match("^%S+")) == 1
+end
+
+local function width_pct()
+  return tostring(math.floor(M.width_ratio * 100)) .. "%"
+end
+
+-- Tập pane còn sống (id kiểu %3) trong toàn server tmux
+local function live_set()
+  local out = vim.fn.system({ "tmux", "list-panes", "-a", "-F", "#{pane_id}" })
+  local set = {}
+  for id in out:gmatch("%%%d+") do
+    set[id] = true
+  end
+  return set
+end
+
+-- Bỏ khỏi danh sách những pane đã đóng
+local function prune()
+  local live = live_set()
+  local kept = {}
+  for _, p in ipairs(M._panes) do
+    if live[p.id] then
+      kept[#kept + 1] = p
+    end
+  end
+  M._panes = kept
+  if M._last_pane and not live[M._last_pane] then
+    M._last_pane = M._panes[#M._panes] and M._panes[#M._panes].id or nil
+  end
+end
+
+local function guard()
+  if not in_tmux() then
+    vim.notify(
+      "Chưa ở trong tmux — mở nvim bên trong tmux để dùng AI pane.\n(Terminal thường: <C-\\>)",
+      vim.log.levels.WARN,
+      { title = "AI" }
+    )
     return false
   end
   return true
 end
 
--- Tạo (hoặc lấy từ cache) một Terminal AI theo key
-function M.get(key, cmd, count, label)
-  if M._terms[key] then
-    return M._terms[key]
+-- Mở 1 AI CLI ở tmux pane bên phải. Mỗi lần gọi = 1 pane mới (không cướp focus).
+function M.open(cmd, label)
+  if not guard() then
+    return
   end
-  local Terminal = require("toggleterm.terminal").Terminal
-  local term = Terminal:new({
-    cmd = cmd,
-    count = count,
-    direction = "vertical", -- split dọc (không phải float)
-    size = ai_width(),
-    close_on_exit = false, -- giữ cửa sổ khi CLI thoát -> đọc được output cuối
-    hidden = true,
-    display_name = label or key,
-    on_open = function(t)
-      M._last = t
-      -- Đẩy cửa sổ AI sang sát PHẢI, full chiều cao.
-      -- Mở thêm session AI: mỗi cái thành 1 cột riêng, cột mới nằm ngoài cùng bên phải.
-      vim.cmd("wincmd L")
-      vim.cmd("vertical resize " .. ai_width())
-      vim.cmd("startinsert")
-      -- Trong terminal AI: <C-q> để ẩn nhanh (giữ session)
-      vim.keymap.set("t", "<C-q>", function()
-        t:toggle()
-      end, { buffer = t.bufnr, desc = "Ẩn AI (giữ session)" })
-    end,
-    on_focus = function(t)
-      M._last = t
-    end,
-  })
-  M._terms[key] = term
-  return term
+  if not executable(cmd) then
+    vim.notify("AI CLI chưa cài: " .. cmd, vim.log.levels.WARN, { title = "AI" })
+    return
+  end
+  prune()
+  local cwd = vim.fn.getcwd()
+  local anchor = M._panes[#M._panes]
+  local args
+  if anchor then
+    -- Đã có cột AI -> xếp chồng pane mới bên dưới cột đó
+    args = { "tmux", "split-window", "-v", "-d", "-t", anchor.id, "-c", cwd, "-P", "-F", "#{pane_id}", cmd }
+  else
+    -- Chưa có -> tạo cột AI full-height bên phải
+    args = { "tmux", "split-window", "-h", "-f", "-d", "-l", width_pct(), "-c", cwd, "-P", "-F", "#{pane_id}", cmd }
+  end
+  local out = vim.fn.system(args)
+  if vim.v.shell_error ~= 0 then
+    vim.notify("tmux split lỗi:\n" .. out, vim.log.levels.ERROR, { title = "AI" })
+    return
+  end
+  local id = vim.trim(out)
+  table.insert(M._panes, { id = id, label = label or cmd })
+  M._last_pane = id
+  vim.notify((label or cmd) .. " → pane " .. id .. "  (tổng " .. #M._panes .. " session)", vim.log.levels.INFO, { title = "AI" })
 end
 
--- Bật/tắt một AI đã đặt tên (claude/codex/gemini). Giữ session giữa các lần bật.
+-- Mở AI theo tên (giữ tên toggle cho tương thích keymap cũ)
 function M.toggle(name)
   local spec = M.named[name]
   if not spec then
     vim.notify("AI chưa cấu hình: " .. tostring(name), vim.log.levels.ERROR)
     return
   end
-  if not ensure(spec.cmd) then
-    return
-  end
-  M.get(name, spec.cmd, spec.count, spec.label):toggle()
+  M.open(spec.cmd, spec.label)
 end
 
--- Claude: tiếp tục session trước đó (persist qua các lần khởi động nvim)
+-- Claude: tiếp tục session hội thoại trước
 function M.claude_continue()
-  if not ensure("claude") then
-    return
-  end
-  M.get("claude_continue", "claude --continue", 190, "Claude ↺"):toggle()
+  M.open("claude --continue", "Claude ↺")
 end
 
--- Mở THÊM một session AI mới (độc lập với session chính) -> chạy nhiều song song
-function M.new_session()
-  local names = vim.tbl_keys(M.named)
-  table.sort(names)
-  vim.ui.select(names, {
-    prompt = "Mở session AI mới:",
-    format_item = function(n)
-      return M.named[n].label
-    end,
-  }, function(choice)
-    if not choice then
-      return
-    end
-    local spec = M.named[choice]
-    if not ensure(spec.cmd) then
-      return
-    end
-    M._counter = M._counter + 1
-    local key = choice .. "#" .. M._counter
-    M.get(key, spec.cmd, M._counter, spec.label .. " #" .. (M._counter - 300)):toggle()
-  end)
-end
-
--- Xem TOÀN BỘ session: liệt kê mọi terminal (kể cả đang ẩn) + trạng thái,
--- chọn 1 cái để nhảy tới. Đây là "trình xem toàn bộ session".
+-- === Xem toàn bộ session AI đang mở, chọn để nhảy tới ===
 function M.sessions()
-  local ok, mod = pcall(require, "toggleterm.terminal")
-  if not ok then
-    vim.notify("toggleterm chưa sẵn sàng", vim.log.levels.WARN)
+  if not guard() then
     return
   end
-  local terms = mod.get_all(true) -- true = gồm cả terminal đang ẩn
-  if not terms or #terms == 0 then
-    vim.notify("Chưa có session nào đang chạy. Mở bằng <leader>ac / <leader>an", vim.log.levels.INFO, { title = "AI sessions" })
+  prune()
+  if #M._panes == 0 then
+    vim.notify("Chưa có session AI. Mở bằng <leader>ac / <leader>ax", vim.log.levels.INFO, { title = "AI" })
     return
   end
-  table.sort(terms, function(a, b)
-    return a.id < b.id
-  end)
-  vim.ui.select(terms, {
-    prompt = "Session đang chạy (" .. #terms .. "):",
-    format_item = function(t)
-      local name = t.display_name or (t.cmd and tostring(t.cmd)) or ("term " .. t.id)
-      local state = t:is_open() and "● mở " or "○ ẩn "
-      return string.format("%s [%d] %s", state, t.id, name)
+  vim.ui.select(M._panes, {
+    prompt = "Session AI (" .. #M._panes .. "):",
+    format_item = function(p)
+      local mark = (p.id == M._last_pane) and "● " or "○ "
+      return mark .. p.label .. "  [" .. p.id .. "]"
     end,
   }, function(choice)
     if not choice then
       return
     end
-    choice:open()
-    M._last = choice
+    vim.fn.system({ "tmux", "select-pane", "-t", choice.id })
+    M._last_pane = choice.id
   end)
 end
 
--- Giữ tên cũ để tương thích keymap; trỏ về trình xem session
-M.select = M.sessions
-
--- === Gửi context vào session AI đang focus (không tự submit -> bạn tự sửa & Enter) ===
-local function insert_into_ai(text)
-  local term = M._last
-  if not (term and term:is_open()) then
-    -- Chưa có AI mở -> mở Claude mặc định rồi chèn
-    term = M.get("claude", "claude", 191, "Claude")
-    term:open()
-    M._last = term
-    vim.defer_fn(function()
-      pcall(vim.api.nvim_chan_send, term.job_id, text)
-    end, 400)
+-- Đóng tất cả pane AI đang mở
+function M.close_all()
+  if not guard() then
     return
   end
-  term:open()
-  pcall(vim.api.nvim_chan_send, term.job_id, text)
+  prune()
+  local n = #M._panes
+  for _, p in ipairs(M._panes) do
+    vim.fn.system({ "tmux", "kill-pane", "-t", p.id })
+  end
+  M._panes = {}
+  M._last_pane = nil
+  vim.notify("Đã đóng " .. n .. " session AI", vim.log.levels.INFO, { title = "AI" })
 end
 
--- Gửi đường dẫn file hiện tại (dạng @path tương đối)
+-- === Gửi context vào pane AI gần nhất (send-keys -l: literal, KHÔNG tự Enter) ===
+local function send_literal(text)
+  if not guard() then
+    return
+  end
+  prune()
+  if not M._last_pane then
+    vim.notify("Chưa có AI pane. Mở bằng <leader>ac trước.", vim.log.levels.INFO, { title = "AI" })
+    return
+  end
+  vim.fn.system({ "tmux", "send-keys", "-t", M._last_pane, "-l", text })
+  if vim.v.shell_error ~= 0 then
+    vim.notify("AI pane đã đóng. Mở lại bằng <leader>ac.", vim.log.levels.WARN, { title = "AI" })
+    M._last_pane = nil
+    return
+  end
+  vim.fn.system({ "tmux", "select-pane", "-t", M._last_pane }) -- nhảy sang pane AI
+end
+
 function M.send_file()
   local abs = vim.fn.expand("%:p")
   if abs == "" then
     vim.notify("Buffer chưa gắn file", vim.log.levels.WARN)
     return
   end
-  insert_into_ai("@" .. vim.fn.fnamemodify(abs, ":.") .. " ")
+  send_literal("@" .. vim.fn.fnamemodify(abs, ":.") .. " ")
 end
 
--- Gửi @path:line của dòng hiện tại
 function M.send_file_line()
-  local rel = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":.")
-  insert_into_ai("@" .. rel .. ":" .. vim.fn.line(".") .. " ")
+  send_literal("@" .. vim.fn.fnamemodify(vim.fn.expand("%:p"), ":.") .. ":" .. vim.fn.line(".") .. " ")
 end
 
--- Gửi @path:start-end của vùng đang chọn (visual)
 function M.send_selection()
-  local rel = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":.")
-  local s = vim.fn.line("v")
-  local e = vim.fn.line(".")
+  local s, e = vim.fn.line("v"), vim.fn.line(".")
   if s > e then
     s, e = e, s
   end
-  insert_into_ai("@" .. rel .. ":" .. s .. "-" .. e .. " ")
+  send_literal("@" .. vim.fn.fnamemodify(vim.fn.expand("%:p"), ":.") .. ":" .. s .. "-" .. e .. " ")
 end
 
--- Xem AI vừa update gì: mở diff các thay đổi (chưa commit) qua diffview
+-- Xem AI vừa update gì: mở diff các thay đổi chưa commit
 function M.review_changes()
   if vim.fn.exists(":DiffviewOpen") == 2 then
     vim.cmd("DiffviewOpen")
   else
-    vim.cmd("Git diff")
+    vim.notify("Cần diffview (đã cài ở plugins/git.lua)", vim.log.levels.WARN)
   end
 end
 

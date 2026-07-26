@@ -41,25 +41,27 @@ Prefix mặc định: **`Ctrl-t`**.
 
 ### AI CLI
 
-Chạy AI CLI ngay trong Neovim. Giữ session (tiến trình vẫn chạy khi ẩn cửa sổ).
+AI CLI chạy dạng **tmux pane bên phải**. Mỗi lần bấm mở **1 pane mới** (không
+cướp focus khỏi Neovim). Pane đầu tạo cột phải, các pane sau xếp chồng trong cột đó.
+> ⚠️ Cần chạy Neovim **bên trong tmux**.
 
 | Phím | Chức năng |
 |---|---|
-| `Ctrl-\` | Bật/tắt terminal nhanh (mọi chế độ) |
-| `Space a c` | Claude · `Space a x` Codex · `Space a g` Gemini |
+| `Space a c` | Claude (pane mới) · `Space a x` Codex · `Space a g` Gemini |
 | `Space a C` | Claude: **tiếp tục session trước** (`--continue`) |
-| `Space a n` | **Mở session AI mới** (chạy nhiều song song) |
-| `Space a s` | **Xem toàn bộ session** (mở/ẩn) + nhảy tới session chọn |
-| `Space a f` | Gửi file hiện tại (`@path`) sang AI |
+| `Space a s` | **Xem toàn bộ session AI** + nhảy tới session chọn |
+| `Space a q` | Đóng tất cả session AI |
+| `Space a f` | Gửi file hiện tại (`@path`) sang AI pane gần nhất |
 | `Space a l` | Gửi `@path:dòng` hiện tại |
 | `Space a v` | (visual) Gửi vùng chọn `@path:range` |
 | `Space a r` | **Xem AI vừa update gì** (mở diff) |
 | `Space a ?` | Xem bảng phím thao tác AI |
-| `Space a t` / `Space a T` | Terminal thường (float / dưới) — chạy test/build |
+| `Space a t` / `Space a T` | Terminal scratch trong nvim (float / dưới) |
+| `Ctrl-\` | Bật/tắt terminal scratch nhanh |
 
-- AI mở dạng **cửa sổ split dọc bên phải** (~40% bề rộng, đổi ở `M.width_ratio` trong `lua/util/ai.lua`). Mở thêm session sẽ stack tiếp về bên phải.
-- Trong cửa sổ AI: `<C-q>` ẩn nhanh (giữ session), `<Esc><Esc>` về normal mode.
-- File do AI sửa trên đĩa → Neovim **tự nạp lại** (autoread).
+- Nhảy vào/ra AI pane bằng `Ctrl-h/j/k/l` (vim-tmux-navigator).
+- Bề rộng cột AI ~40%, đổi ở `M.width_ratio` trong `lua/util/ai.lua`.
+- File do AI sửa trên đĩa → Neovim **tự nạp lại** (autoread + focus-events).
 - Gửi context **không tự submit** — bạn xem/sửa rồi tự Enter.
 
 ### Git

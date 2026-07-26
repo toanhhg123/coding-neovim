@@ -45,3 +45,23 @@ map("v", ">", ">gv", { desc = "Thụt phải, giữ chọn" })
 
 -- === Terminal: về normal mode dễ hơn ===
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Terminal -> normal mode" })
+
+-- === AI CLI (mở dạng tmux pane bên phải — xem lua/util/ai.lua) ===
+local function ai()
+  return require("util.ai")
+end
+-- Mở session AI (mỗi lần bấm = 1 pane mới)
+map("n", "<leader>ac", function() ai().toggle("claude") end, { desc = "AI: Claude (pane mới)" })
+map("n", "<leader>ax", function() ai().toggle("codex") end, { desc = "AI: Codex (pane mới)" })
+map("n", "<leader>ag", function() ai().toggle("gemini") end, { desc = "AI: Gemini (pane mới)" })
+map("n", "<leader>aC", function() ai().claude_continue() end, { desc = "AI: Claude tiếp tục session" })
+-- Quản lý session
+map("n", "<leader>as", function() ai().sessions() end, { desc = "AI: xem toàn bộ session + nhảy tới" })
+map("n", "<leader>aq", function() ai().close_all() end, { desc = "AI: đóng tất cả session" })
+-- Gửi context sang AI pane gần nhất
+map("n", "<leader>af", function() ai().send_file() end, { desc = "AI: gửi file (@path)" })
+map("n", "<leader>al", function() ai().send_file_line() end, { desc = "AI: gửi @path:dòng" })
+map("v", "<leader>av", function() ai().send_selection() end, { desc = "AI: gửi vùng chọn (@path:range)" })
+-- Review & trợ giúp
+map("n", "<leader>ar", function() ai().review_changes() end, { desc = "AI: xem vừa update gì (diff)" })
+map("n", "<leader>a?", function() ai().show_keys() end, { desc = "AI: xem phím thao tác" })
