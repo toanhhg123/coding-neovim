@@ -3,7 +3,7 @@
 
 local M = {}
 
-M.enabled = true      -- trạng thái hiện tại
+M.enabled = false     -- trạng thái mặc định: TẮT (bật bằng <leader>cl / :LspEnable)
 M.servers = {}        -- danh sách server generic (lsp.lua điền vào)
 
 local function notify(on)

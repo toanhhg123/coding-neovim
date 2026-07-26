@@ -116,6 +116,10 @@ Server tự cài qua `:Mason`. Đã có: Lua, JS/TS, HTML/CSS, Tailwind, JSON, Y
 Bật/tắt toàn bộ LSP còn có lệnh: `:LspToggle` · `:LspEnable` · `:LspDisable`
 (tắt = dừng mọi client kể cả jdtls + chặn tự attach; bật = gắn lại các buffer đang mở).
 
+> ⚙️ **Mặc định LSP TẮT** khi khởi động (đọc code nhẹ, không giật). Bật khi cần
+> điều hướng/hiểu code bằng `Space c l` hoặc `:LspEnable`. Đổi mặc định ở
+> `M.enabled` trong `lua/util/lsp.lua`.
+
 - Quản lý server: `:Mason` (cài/gỡ). Xem trạng thái LSP: `:checkhealth lsp`.
 - **Java / Spring**: qua `nvim-jdtls` (chạy bằng Java 21), cấu hình trong
   `lua/plugins/java.lua`. Lần đầu mở file `.java` jdtls sẽ **import project

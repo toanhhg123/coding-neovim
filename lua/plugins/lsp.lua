@@ -103,12 +103,14 @@ return {
           vim.lsp.config(name, opts)
         end
       end
-      vim.lsp.enable(vim.tbl_keys(servers))
-
       -- Bật/tắt toàn bộ LSP: :LspToggle/:LspEnable/:LspDisable + <leader>cl
       local toggle = require("util.lsp")
       toggle.servers = vim.tbl_keys(servers)
       toggle.setup_commands()
+      -- Áp dụng trạng thái mặc định (mặc định TẮT -> không auto-enable ở đây)
+      if toggle.enabled then
+        vim.lsp.enable(toggle.servers)
+      end
     end,
   },
 }
