@@ -238,7 +238,7 @@ Sẽ được bổ sung dần khi build. Dự kiến:
 
 | Tool | Mục đích | Cài |
 |---|---|---|
-| Neovim ≥ 0.10 | Editor | `brew install neovim` / `apt` / ... |
+| Neovim ≥ 0.12 | Editor (aerial/treesitter cần 0.12) | `brew install neovim` / `apt` / ... |
 | `ripgrep` | Live grep | `brew install ripgrep` |
 | `fd` | Tìm file | `brew install fd` |
 | Nerd Font | Icon | https://www.nerdfonts.com |

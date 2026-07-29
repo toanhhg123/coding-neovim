@@ -5,7 +5,6 @@
 return {
   {
     "stevearc/aerial.nvim",
-    version = "v3.1.0", -- bản cuối hỗ trợ Neovim < 0.12 (bạn đang 0.11.x); master yêu cầu 0.12
     cmd = { "AerialToggle", "AerialOpen", "AerialNavToggle" },
     keys = {
       { "<leader>co", "<cmd>AerialToggle<CR>", desc = "Outline: bật/tắt cấu trúc file" },
