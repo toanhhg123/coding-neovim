@@ -77,4 +77,25 @@ return {
       },
     },
   },
+
+  -- ============================================================
+  -- git-conflict: highlight & resolve merge conflict (khi review/rebase)
+  -- ============================================================
+  {
+    "akinsho/git-conflict.nvim",
+    version = "*",
+    event = { "BufReadPre", "BufNewFile" },
+    keys = {
+      { "<leader>gx", "<cmd>GitConflictListQf<CR>", desc = "Conflict: liệt kê (quickfix)" },
+    },
+    opts = {
+      default_mappings = true,   -- co/ct/cb/c0 + ]x/[x (chỉ hiệu lực trong buffer có conflict)
+      disable_diagnostics = false,
+      highlights = {
+        incoming = "DiffAdd",
+        current = "DiffText",
+      },
+    },
+    -- co=chọn phần mình, ct=chọn phần họ, cb=cả hai, c0=không cái nào; ]x/[x nhảy conflict
+  },
 }

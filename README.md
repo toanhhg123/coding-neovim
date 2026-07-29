@@ -21,6 +21,7 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 - [x] Bước 5 — Git (gitsigns + diffview) ✅
 - [x] Bước 6 — AI CLI (toggleterm: claude/codex, nhiều session, gửi context) ✅
 - [x] Bước 7 — tmux (vim-tmux-navigator + config mới + sessionizer BE/FE/job) ✅
+- [x] Extra — Search&Replace (grug-far) · Outline (aerial) · autopairs · git-conflict ✅
 - [ ] ... (xem DESIGN.md §7)
 
 ### tmux
@@ -155,8 +156,19 @@ Bật/tắt toàn bộ LSP còn có lệnh: `:LspToggle` · `:LspEnable` · `:Ls
 | `Space g D` | Diff so với base branch (`origin/HEAD...HEAD`) |
 | `Space g h` / `Space g H` | Lịch sử file hiện tại / toàn repo |
 | `Space g c` | Đóng diffview |
+| `Space g x` | **Liệt kê merge conflict** ra quickfix |
 
 Trong diffview: `Tab`/`Shift-Tab` chuyển file, `]c`/`[c` nhảy hunk, `q` để đóng.
+
+**Resolve merge conflict** (git-conflict) — chỉ hiệu lực trong file có dấu `<<<<<<<`:
+
+| Phím | Chức năng |
+|---|---|
+| `co` | Chọn phần **của mình** (current) |
+| `ct` | Chọn phần **của họ** (incoming) |
+| `cb` | Giữ **cả hai** |
+| `c0` | **Bỏ cả hai** |
+| `]x` / `[x` | Nhảy conflict kế tiếp / trước |
 
 ### Phím search (Telescope)
 
@@ -173,6 +185,31 @@ Trong diffview: `Tab`/`Shift-Tab` chuyển file, `]c`/`[c` nhảy hunk, `q` đ�
 
 Trong ô tìm: `Ctrl-j/k` di chuyển, `Ctrl-q` gửi kết quả ra quickfix, `Esc` đóng.
 
+### Search & Replace toàn project (grug-far)
+
+Tìm & **thay thế hàng loạt** qua nhiều file (ripgrep). Mở 1 buffer chuyên dụng:
+gõ **Search / Replace / Files-filter** → xem preview → apply.
+
+| Phím | Chức năng |
+|---|---|
+| `Space s r` | Mở Search & Replace toàn project |
+| `Space s w` | ... với **từ dưới con trỏ** điền sẵn |
+| `Space s f` | ... giới hạn trong **file hiện tại** |
+| `Space s` (visual) | ... với **vùng chọn** điền sẵn |
+
+Trong buffer grug-far: sửa dòng Search/Replace rồi lưu; `<C-Enter>` (hoặc dòng lệnh trong header) để apply. Hỗ trợ regex & flag ripgrep.
+
+### Outline cấu trúc file (aerial)
+
+Danh sách **class / function / method** để nhảy nhanh trong file dài — chạy bằng
+**treesitter** nên **dùng được cả khi LSP tắt**.
+
+| Phím | Chức năng |
+|---|---|
+| `Space c o` | Bật/tắt panel outline (bên phải) |
+| `Space c O` | Popup điều hướng nhanh (nav) |
+| `{` / `}` | Nhảy symbol trước / kế tiếp |
+
 ### UI
 
 - **Colorscheme**: Tokyonight, **nền trong suốt** (thấy nền iTerm phía sau). Đổi tông
@@ -182,6 +219,7 @@ Trong ô tìm: `Ctrl-j/k` di chuyển, `Ctrl-q` gửi kết quả ra quickfix, `
   `Space ?` → xem phím tắt riêng của buffer hiện tại.
 - **lualine**: statusline hiện mode · nhánh git · diff · diagnostic · file · vị trí dòng:cột.
 - **bufferline**: thanh tab các file đang mở ở trên cùng.
+- **autopairs**: tự đóng ngoặc/quote theo ngữ cảnh treesitter. `Alt-e` bọc nhanh phần còn lại của dòng vào ngoặc.
 
 | Phím | Tab (file đang mở) |
 |---|---|
@@ -237,8 +275,10 @@ nvim
 | Prefix | Nhóm |
 |---|---|
 | `<leader>f` | Find / Search |
+| `<leader>s` | Search / Replace (grug-far) |
 | `<leader>g` | Git |
 | `<leader>a` | AI CLI |
+| `<leader>c` | Code / LSP / Outline |
 | `Ctrl-h/j/k/l` | Nhảy giữa split & tmux pane |
 
 `leader` = `Space`.

@@ -17,6 +17,7 @@ return {
       -- Đặt TÊN cho các namespace -> bảng gợi ý gọn gàng, phân nhóm rõ
       spec = {
         { "<leader>f", group = "Find / Search" },
+        { "<leader>s", group = "Search / Replace" },
         { "<leader>g", group = "Git" },
         { "<leader>a", group = "AI CLI" },
         { "<leader>b", group = "Buffer" },

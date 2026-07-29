@@ -150,7 +150,9 @@ Chúng ta build **tăng dần**, mỗi bước chạy được & commit riêng:
 - [x] **Bước 7** — tmux navigator + config tmux + sessionizer BE/FE/job
 - [x] **Bước 8** — LSP tối giản (mason + lspconfig, navigation-focused)
 - [x] colorscheme (Tokyonight trong suốt) + file explorer (neo-tree) + markdown preview
-- [ ] còn lại (tùy chọn) — completion (blink/cmp), avante inline, trouble, nvim-jdtls cho Java
+- [x] nvim-jdtls cho Java/Spring (Java 21 + Lombok) + toggle bật/tắt toàn bộ LSP (mặc định TẮT)
+- [x] Extra — grug-far (search & replace project) · aerial (outline treesitter) · nvim-autopairs · git-conflict
+- [ ] còn lại (tùy chọn) — completion (blink/cmp), avante inline, trouble, harpoon, flash
 
 ---
 
