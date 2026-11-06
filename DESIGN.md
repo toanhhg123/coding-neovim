@@ -144,7 +144,7 @@ Chúng ta build **tăng dần**, mỗi bước chạy được & commit riêng:
 - [x] **Bước 1** — `init.lua` + bootstrap lazy.nvim + `options`/`keymaps`/`autocmds` cơ bản
 - [~] **Bước 2** — which-key + lualine + bufferline (còn colorscheme)
 - [x] **Bước 3** — Search & Navigation (telescope + fzf-native) ← trọng tâm
-- [x] **Bước 4** — Treesitter (highlight + textobjects)
+- [x] **Bước 4** — Treesitter nhánh `main` (highlight + textobjects, cần Neovim 0.12)
 - [x] **Bước 5** — Git (gitsigns + diffview)
 - [x] **Bước 6** — AI CLI (toggleterm + claude/codex, nhiều session) + auto-reload
 - [x] **Bước 7** — tmux navigator + config tmux + sessionizer BE/FE/job

@@ -28,14 +28,12 @@ return {
 
         -- --- Nhảy giữa các hunk (thay đổi) ---
         map("n", "]c", function()
-          if vim.wo.diff then return "]c" end
-          vim.schedule(function() gs.nav_hunk("next") end)
-          return "<Ignore>"
+          if vim.wo.diff then return vim.cmd.normal({ "]c", bang = true }) end
+          gs.nav_hunk("next")
         end, "Hunk kế tiếp")
         map("n", "[c", function()
-          if vim.wo.diff then return "[c" end
-          vim.schedule(function() gs.nav_hunk("prev") end)
-          return "<Ignore>"
+          if vim.wo.diff then return vim.cmd.normal({ "[c", bang = true }) end
+          gs.nav_hunk("prev")
         end, "Hunk trước")
 
         -- --- Xem / stage / reset hunk ---

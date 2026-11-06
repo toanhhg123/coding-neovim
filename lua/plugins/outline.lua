@@ -9,8 +9,9 @@ return {
     keys = {
       { "<leader>co", "<cmd>AerialToggle<CR>", desc = "Outline: bật/tắt cấu trúc file" },
       { "<leader>cO", "<cmd>AerialNavToggle<CR>", desc = "Outline: popup điều hướng nhanh" },
-      { "{", "<cmd>AerialPrev<CR>", desc = "Symbol trước" },
-      { "}", "<cmd>AerialNext<CR>", desc = "Symbol kế tiếp" },
+      -- Không dùng { } vì sẽ đè phím nhảy đoạn văn gốc của Vim
+      { "[o", "<cmd>AerialPrev<CR>", desc = "Symbol trước" },
+      { "]o", "<cmd>AerialNext<CR>", desc = "Symbol kế tiếp" },
     },
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
     opts = {

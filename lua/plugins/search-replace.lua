@@ -38,9 +38,6 @@ return {
         desc = "Search & Replace: vùng chọn",
       },
     },
-    opts = {
-      -- Gọn, hợp workflow đọc code: mở dạng split, dùng ripgrep sẵn có
-      headerMaxWidth = 80,
-    },
+    opts = {},
   },
 }

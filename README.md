@@ -19,7 +19,7 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 - [x] Bước 8 — LSP tối giản (mason + lspconfig, navigation-focused) ✅
 - [x] Extra — File explorer (neo-tree) · Markdown preview ✅
 - [x] Bước 5 — Git (gitsigns + diffview) ✅
-- [x] Bước 6 — AI CLI (toggleterm: claude/codex, nhiều session, gửi context) ✅
+- [x] Bước 6 — AI CLI (tmux pane: claude/codex, nhiều session, gửi context) ✅
 - [x] Bước 7 — tmux (vim-tmux-navigator + config mới + sessionizer BE/FE/job) ✅
 - [x] Extra — Search&Replace (grug-far) · Outline (aerial) · autopairs · git-conflict ✅
 - [ ] ... (xem DESIGN.md §7)
@@ -82,11 +82,12 @@ Trong cây: `l`/`Enter` mở · `h` đóng nhánh · `P` xem preview · `a` thê
 
 ### Đọc code (Treesitter)
 
-Highlight chính xác theo cây cú pháp cho JS/TS, Java, HTML/CSS, JSON/YAML... (25 parser).
+Highlight chính xác theo cây cú pháp cho JS/TS, Java, HTML/CSS, JSON/YAML... (24 parser).
+Dùng `nvim-treesitter` nhánh `main` (bắt buộc với Neovim 0.12), cần `tree-sitter-cli`.
 
 | Phím | Chức năng |
 |---|---|
-| `Ctrl-Space` | Mở rộng vùng chọn theo cú pháp (bấm tiếp để rộng thêm) · `BS` thu lại |
+| `Ctrl-Space` | Chọn theo cú pháp (bấm tiếp để rộng thêm) · `BS` thu lại — dựa trên `an`/`in` có sẵn của Neovim 0.12 |
 | `af` / `if` | Chọn cả hàm / thân hàm |
 | `ac` / `ic` | Chọn cả class / thân class |
 | `aa` / `ia` | Chọn tham số |
@@ -141,7 +142,7 @@ Bật/tắt toàn bộ LSP còn có lệnh: `:LspToggle` · `:LspEnable` · `:Ls
 | `Space m r` | Render markdown **trong editor** (bật/tắt) — heading, bảng, code, checkbox |
 | `Space m p` | Preview trên **trình duyệt** (live, cuộn đồng bộ) |
 
-> render-markdown bật sẵn khi mở file `.md`. markdown-preview tải binary khi cài lần đầu.
+> render-markdown bật sẵn khi mở file `.md`. markdown-preview chạy bằng `node` (cài dependency khi cài plugin).
 
 ### Git
 
@@ -197,7 +198,7 @@ gõ **Search / Replace / Files-filter** → xem preview → apply.
 | `Space s f` | ... giới hạn trong **file hiện tại** |
 | `Space s` (visual) | ... với **vùng chọn** điền sẵn |
 
-Trong buffer grug-far: sửa dòng Search/Replace rồi lưu; `<C-Enter>` (hoặc dòng lệnh trong header) để apply. Hỗ trợ regex & flag ripgrep.
+Trong buffer grug-far: gõ vào ô Search/Replace, kết quả tự hiện. `Space r` để **apply**, `Space q` đưa ra quickfix, `Space c` đóng (dòng header luôn hiện đủ phím). Hỗ trợ regex & flag ripgrep.
 
 ### Outline cấu trúc file (aerial)
 
@@ -208,7 +209,7 @@ Danh sách **class / function / method** để nhảy nhanh trong file dài — 
 |---|---|
 | `Space c o` | Bật/tắt panel outline (bên phải) |
 | `Space c O` | Popup điều hướng nhanh (nav) |
-| `{` / `}` | Nhảy symbol trước / kế tiếp |
+| `[o` / `]o` | Nhảy symbol trước / kế tiếp |
 
 ### UI
 
@@ -239,6 +240,7 @@ Sẽ được bổ sung dần khi build. Dự kiến:
 | Tool | Mục đích | Cài |
 |---|---|---|
 | Neovim ≥ 0.12 | Editor (aerial/treesitter cần 0.12) | `brew install neovim` / `apt` / ... |
+| `tree-sitter-cli` ≥ 0.26.1 + C compiler | Build parser treesitter (**không** cài qua npm) | `brew install tree-sitter-cli` |
 | `ripgrep` | Live grep | `brew install ripgrep` |
 | `fd` | Tìm file | `brew install fd` |
 | Nerd Font | Icon | https://www.nerdfonts.com |

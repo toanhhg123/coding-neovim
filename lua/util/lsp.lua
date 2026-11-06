@@ -28,7 +28,7 @@ function M.set(on)
   else
     -- Dừng mọi client đang chạy (gồm cả jdtls)
     for _, c in ipairs(vim.lsp.get_clients()) do
-      vim.lsp.stop_client(c.id, true)
+      c:stop(true)
     end
   end
 
