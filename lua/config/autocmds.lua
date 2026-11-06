@@ -12,7 +12,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
--- === Auto-reload file khi bị đổi bên ngoài (AI CLI sửa file trên đĩa) ===
+-- === Auto-reload file khi bị đổi bên ngoài (git pull, đổi nhánh...) ===
 -- autoread đã bật trong options; cần kích checktime khi focus/enter buffer.
 vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
   group = augroup("auto_reload"),

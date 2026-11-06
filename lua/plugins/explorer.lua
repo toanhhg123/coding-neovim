@@ -51,7 +51,7 @@ return {
       filesystem = {
         bind_to_cwd = true,
         follow_current_file = { enabled = true }, -- tự highlight file đang mở
-        use_libuv_file_watcher = true, -- tự cập nhật khi file đổi (AI CLI sửa)
+        use_libuv_file_watcher = true, -- tự cập nhật khi file đổi
         hijack_netrw_behavior = "open_default", -- mở thư mục = mở neo-tree
         filtered_items = {
           hide_dotfiles = false, -- vẫn thấy dotfiles (.env, .config...)

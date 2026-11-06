@@ -1,7 +1,7 @@
 # coding-neovim — Design Document
 
 > Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho việc **đọc code, điều hướng, search**
-> và **coding cùng AI CLI** (Claude, Codex, ...), phối hợp với **tmux**.
+> và **tự học, tự viết code** (không dùng công cụ AI), phối hợp với **tmux**.
 
 ---
 
@@ -15,7 +15,7 @@ Neovim ở đây đóng vai trò một **"code cockpit" nhẹ, di động**:
 - 🔀 **Di chuyển session mượt**: nhảy qua lại giữa các ngữ cảnh **BE / FE / job** (dùng tmux).
 - 🔎 **Search mạnh**: tìm file, tìm từ khoá, tìm symbol trong thư mục lớn cực nhanh.
 - 📖 **Dễ đọc code**: highlight tốt, điều hướng definition/reference, đọc diff, đọc git blame.
-- 🤖 **AI CLI trong tầm tay**: mở `claude` / `codex` ngay trong session, gửi context nhanh.
+- 🎓 **Tự học**: mọi thao tác do người dùng tự làm, repo không tích hợp công cụ AI.
 
 ### Không nằm trong phạm vi (để riêng cho IDE chính)
 - Debugger nặng (DAP), test runner phức tạp, linter/formatter bắt buộc.
@@ -52,7 +52,7 @@ Neovim ở đây đóng vai trò một **"code cockpit" nhẹ, di động**:
 │       ├── treesitter.lua    # highlight + textobjects
 │       ├── lsp.lua           # LSP tối giản (navigation-focused)
 │       ├── git.lua           # gitsigns, diffview, (neogit tùy chọn)
-│       └── ai.lua            # toggleterm + AI CLI, (avante tùy chọn)
+│       └── terminal.lua      # terminal nhanh (toggleterm)
 ├── DESIGN.md                # tài liệu này
 └── README.md                # hướng dẫn cài đặt & phím tắt
 ```
@@ -84,14 +84,9 @@ Neovim ở đây đóng vai trò một **"code cockpit" nhẹ, di động**:
 - **`diffview.nvim`**: xem diff toàn branch (`main...HEAD`), file history.
 - Mục tiêu: **review nhanh trước khi commit/push**, không thay thế git workflow chính.
 
-### 4.4 AI CLI trong session
-- **`toggleterm.nvim`**: terminal float/split bật-tắt tức thì, giữ session:
-  - `<leader>ac` → `claude`
-  - `<leader>ax` → `codex`
-  - `<leader>at` → terminal trống (chạy lệnh nhanh)
-- **Auto-reload**: khi AI sửa file trên đĩa → Neovim tự nạp lại (autoread + checktime).
-- **Gửi context**: keymap gửi `path:line` của file đang mở sang session AI.
-- **`avante.nvim`** (tùy chọn, giai đoạn sau): hỏi/refactor inline, nhận diff.
+### 4.4 Terminal
+- **`toggleterm.nvim`**: terminal float/split bật-tắt tức thì (`Ctrl-\`, `<leader>tt`).
+- **Auto-reload**: file đổi bên ngoài (git pull, đổi nhánh) → Neovim tự nạp lại.
 
 ### 4.5 tmux integration (giữa các session)
 - **`vim-tmux-navigator`**: dùng `Ctrl-h/j/k/l` để nhảy liền mạch giữa
@@ -101,7 +96,7 @@ Neovim ở đây đóng vai trò một **"code cockpit" nhẹ, di động**:
 - Gợi ý workflow tmux:
   - Mỗi **project/ngữ cảnh** = 1 tmux session (`be`, `fe`, `job`).
   - Dùng `tmux switch-client` / `sessionizer` (fzf) để nhảy giữa BE/FE/job trong 1-2 phím.
-  - Trong mỗi session: pane trái = Neovim, pane phải = AI CLI / logs / test.
+  - Trong mỗi session: pane trái = Neovim, pane phụ = logs / test.
 
 ---
 
@@ -113,7 +108,7 @@ Neovim ở đây đóng vai trò một **"code cockpit" nhẹ, di động**:
 |---|---|---|
 | `<leader>f` | **Find/Search** | `ff` file, `fg` grep, `fb` buffer, `fs` symbol |
 | `<leader>g` | **Git** | `gd` diffview, `gb` blame, `gh` hunk history |
-| `<leader>a` | **AI** | `ac` claude, `ax` codex, `af` gửi file/context |
+| `<leader>t` | **Terminal** | `tt` nổi, `tT` bên dưới |
 | `<leader>e` | **Explorer** | `e` toggle file tree |
 | `<leader>b` | **Buffer** | chuyển/đóng buffer |
 | `g` `[` `]` | **Navigation** | `gd` def, `gr` refs, `]c`/`[c` hunk, `]d`/`[d` diagnostic |
@@ -146,13 +141,13 @@ Chúng ta build **tăng dần**, mỗi bước chạy được & commit riêng:
 - [x] **Bước 3** — Search & Navigation (telescope + fzf-native) ← trọng tâm
 - [x] **Bước 4** — Treesitter nhánh `main` (highlight + textobjects, cần Neovim 0.12)
 - [x] **Bước 5** — Git (gitsigns + diffview)
-- [x] **Bước 6** — AI CLI (toggleterm + claude/codex, nhiều session) + auto-reload
+- [x] **Bước 6** — Terminal (toggleterm) + auto-reload (đã bỏ AI CLI)
 - [x] **Bước 7** — tmux navigator + config tmux + sessionizer BE/FE/job
 - [x] **Bước 8** — LSP tối giản (mason + lspconfig, navigation-focused)
 - [x] colorscheme (Tokyonight trong suốt) + file explorer (neo-tree) + markdown preview
 - [x] nvim-jdtls cho Java/Spring (Java 21 + Lombok) + toggle bật/tắt toàn bộ LSP (mặc định TẮT)
 - [x] Extra — grug-far (search & replace project) · aerial (outline treesitter) · nvim-autopairs · git-conflict
-- [ ] còn lại (tùy chọn) — completion (blink/cmp), avante inline, trouble, harpoon, flash
+- [ ] còn lại (tùy chọn) — completion (blink/cmp), trouble, harpoon, flash
 
 ---
 
@@ -162,4 +157,3 @@ Chúng ta build **tăng dần**, mỗi bước chạy được & commit riêng:
 - ✅ Copy repo sang máy/OS khác → chạy được sau khi cài vài binary liệt kê sẵn.
 - ✅ Từ lúc mở Neovim tới lúc grep ra 1 từ khoá trong project < 3 giây thao tác.
 - ✅ Nhảy BE ↔ FE ↔ job qua tmux trong ≤ 2 phím.
-- ✅ Mở `claude`/`codex` và quay lại code không mất session, file tự cập nhật.

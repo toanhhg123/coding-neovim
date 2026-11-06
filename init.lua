@@ -1,5 +1,5 @@
 -- coding-neovim — entrypoint
--- Cấu hình nhẹ, cross-OS cho đọc code / search / AI CLI + tmux.
+-- Cấu hình nhẹ, cross-OS cho đọc code / search / code + tmux.
 -- Thứ tự nạp: leader phải set TRƯỚC khi lazy.nvim khởi động.
 
 -- 1) Options + keymaps + autocmds cơ bản (không phụ thuộc plugin)

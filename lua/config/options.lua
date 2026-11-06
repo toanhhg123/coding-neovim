@@ -44,7 +44,7 @@ opt.clipboard = "unnamedplus"
 opt.undofile = true          -- lưu undo qua các lần mở file
 opt.swapfile = false
 opt.backup = false
-opt.autoread = true          -- tự đọc lại file khi bị đổi bên ngoài (AI CLI sửa file)
+opt.autoread = true          -- tự đọc lại file khi bị đổi bên ngoài (git pull, đổi nhánh...)
 opt.updatetime = 250         -- phản hồi nhanh hơn (CursorHold, git blame...)
 opt.timeoutlen = 400         -- chờ chuỗi phím (which-key hiện gợi ý)
 

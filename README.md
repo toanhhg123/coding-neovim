@@ -1,7 +1,7 @@
 # coding-neovim
 
-Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hướng, search** và
-**coding cùng AI CLI** (Claude, Codex, ...) trong workflow **tmux**.
+Cấu hình Neovim **nhẹ, cross-OS** để **tự học và tự viết code**: đọc code, điều hướng,
+search và lập trình trong workflow **tmux**. Không dùng công cụ AI.
 
 > 📖 Xem [DESIGN.md](DESIGN.md) để hiểu triết lý, kiến trúc và lộ trình build.
 
@@ -19,7 +19,6 @@ Cấu hình Neovim **nhẹ, cross-OS**, tối ưu cho **đọc code, điều hư
 - [x] Bước 8 — LSP tối giản (mason + lspconfig, navigation-focused) ✅
 - [x] Extra — File explorer (neo-tree) · Markdown preview ✅
 - [x] Bước 5 — Git (gitsigns + diffview) ✅
-- [x] Bước 6 — AI CLI (tmux pane: claude/codex, nhiều session, gửi context) ✅
 - [x] Bước 7 — tmux (vim-tmux-navigator + config mới + sessionizer BE/FE/job) ✅
 - [x] Extra — Search&Replace (grug-far) · Outline (aerial) · autopairs · git-conflict ✅
 - [ ] ... (xem DESIGN.md §7)
@@ -45,30 +44,12 @@ Prefix mặc định: **`Ctrl-t`**.
   (đổi bằng biến `TMUX_SESSIONIZER_PATHS`). Cần `fzf` (+ `fd` nếu có).
 - Đã bật `focus-events` (Neovim autoread trong tmux) + true color.
 
-### AI CLI
-
-AI CLI chạy dạng **tmux pane bên phải**. Mỗi lần bấm mở **1 pane mới** (không
-cướp focus khỏi Neovim), thêm **cột mới bên phải, cạnh nhau** (full-height).
-> ⚠️ Cần chạy Neovim **bên trong tmux**.
+### Terminal
 
 | Phím | Chức năng |
 |---|---|
-| `Space a c` | Claude (pane mới) · `Space a x` Codex · `Space a g` Gemini |
-| `Space a C` | Claude: **tiếp tục session trước** (`--continue`) |
-| `Space a s` | **Xem toàn bộ session AI** + nhảy tới session chọn |
-| `Space a q` | Đóng tất cả session AI |
-| `Space a f` | Gửi file hiện tại (`@path`) sang AI pane gần nhất |
-| `Space a l` | Gửi `@path:dòng` hiện tại |
-| `Space a v` | (visual) Gửi vùng chọn `@path:range` |
-| `Space a r` | **Xem AI vừa update gì** (mở diff) |
-| `Space a ?` | Xem bảng phím thao tác AI |
-| `Space a t` / `Space a T` | Terminal scratch trong nvim (float / dưới) |
-| `Ctrl-\` | Bật/tắt terminal scratch nhanh |
-
-- Nhảy vào/ra AI pane bằng `Ctrl-h/j/k/l` (vim-tmux-navigator).
-- Bề rộng cột AI ~40%, đổi ở `M.width_ratio` trong `lua/util/ai.lua`.
-- File do AI sửa trên đĩa → Neovim **tự nạp lại** (autoread + focus-events).
-- Gửi context **không tự submit** — bạn xem/sửa rồi tự Enter.
+| `Ctrl-\` | Bật/tắt terminal nhanh |
+| `Space t t` / `Space t T` | Terminal nổi / bên dưới |
 
 ### File explorer (neo-tree)
 
@@ -216,7 +197,7 @@ Danh sách **class / function / method** để nhảy nhanh trong file dài — 
 - **Colorscheme**: Tokyonight, **nền trong suốt** (thấy nền iTerm phía sau). Đổi tông
   ở `style` trong `lua/plugins/colorscheme.lua` (`night`/`storm`/`moon`/`day`).
   Transparent áp dụng bền kể cả khi đổi sang colorscheme khác.
-- **which-key**: bấm `Space` rồi chờ ~0.3s → hiện bảng gợi ý phím theo nhóm (Find/Git/AI...).
+- **which-key**: bấm `Space` rồi chờ ~0.3s → hiện bảng gợi ý phím theo nhóm (Find/Git/Java...).
   `Space ?` → xem phím tắt riêng của buffer hiện tại.
 - **lualine**: statusline hiện mode · nhánh git · diff · diagnostic · file · vị trí dòng:cột.
 - **bufferline**: thanh tab các file đang mở ở trên cùng.
@@ -248,7 +229,6 @@ Sẽ được bổ sung dần khi build. Dự kiến:
 | `tmux` ≥ 3.3 | Session BE/FE/job | `brew install tmux` |
 | `fzf` | Sessionizer | `brew install fzf` |
 | `node` | Một số LSP | — |
-| `claude` / `codex` CLI | AI trong session | theo hướng dẫn từng tool |
 
 ---
 
@@ -279,7 +259,7 @@ nvim
 | `<leader>f` | Find / Search |
 | `<leader>s` | Search / Replace (grug-far) |
 | `<leader>g` | Git |
-| `<leader>a` | AI CLI |
+| `<leader>t` | Terminal |
 | `<leader>c` | Code / LSP / Outline |
 | `Ctrl-h/j/k/l` | Nhảy giữa split & tmux pane |
 

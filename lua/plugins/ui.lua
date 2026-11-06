@@ -19,7 +19,7 @@ return {
         { "<leader>f", group = "Find / Search" },
         { "<leader>s", group = "Search / Replace" },
         { "<leader>g", group = "Git" },
-        { "<leader>a", group = "AI CLI" },
+        { "<leader>t", group = "Terminal" },
         { "<leader>b", group = "Buffer" },
         { "<leader>c", group = "Code / LSP" },
         { "<leader>e", group = "Explorer" },
