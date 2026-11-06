@@ -13,7 +13,7 @@ return {
 
   {
     "neovim/nvim-lspconfig",
-    lazy = true, -- nạp từ util/lsp.lua lúc bật LSP
+    lazy = true, -- nạp từ util/lsp.lua
     dependencies = {
       { "williamboman/mason.nvim" },
       { "williamboman/mason-lspconfig.nvim" },
@@ -112,7 +112,7 @@ return {
       end
       -- Bật/tắt toàn bộ LSP: :LspToggle/:LspEnable/:LspDisable + <leader>cl
       local toggle = require("util.lsp")
-      -- Mặc định TẮT: register chỉ ghi nhận, chưa khởi động server nào
+      -- register bật server nếu LSP đang bật, đang tắt thì chỉ ghi nhận
       toggle.register(vim.tbl_keys(servers))
     end,
   },

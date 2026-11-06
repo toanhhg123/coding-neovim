@@ -100,9 +100,9 @@ Server tự cài qua `:Mason`. Đã có: Lua, JS/TS, HTML/CSS, Tailwind, JSON, Y
 Bật/tắt toàn bộ LSP còn có lệnh: `:LspToggle` · `:LspEnable` · `:LspDisable`
 (tắt = dừng mọi client kể cả jdtls + chặn tự attach; bật = gắn lại các buffer đang mở).
 
-> ⚙️ **Mặc định LSP TẮT** khi khởi động (đọc code nhẹ, mason/lspconfig chỉ nạp khi bật). Bật khi cần
-> điều hướng/hiểu code bằng `Space c l` hoặc `:LspEnable`. Đổi mặc định ở
-> `M.enabled` trong `lua/util/lsp.lua`.
+> ⚙️ **Mặc định LSP BẬT**: server tự chạy khi mở file đúng loại, vd jdtls khi mở `.java`. Tắt tạm bằng
+> `Space c l` hoặc `:LspDisable` (không lưu lại khi mở Neovim lần sau). Đổi mặc định ở `M.enabled`
+> trong `lua/util/lsp.lua`.
 
 - Quản lý server: `:Mason` (cài/gỡ). Xem trạng thái LSP: `:checkhealth lsp`.
 - **Java / Spring**: xem mục [Spring Boot](#spring-boot) bên dưới.
@@ -133,7 +133,7 @@ terminal split. `JAVA_HOME` tự đặt đúng version trong `pom.xml`/`build.gr
 | `Space c i` / `Space c I` | Ai gọi hàm này / hàm này gọi gì | ✓ |
 | `Space c h` / `Space c H` | Class con, implement / class cha, interface | ✓ |
 
-Khi bật LSP (`Space c l`):
+Khi LSP đang bật:
 - **jdtls** chạy bằng JDK mới nhất có trên máy (**jdtls 1.63 cần Java 25**, không khởi động được
   trên Java 21); project vẫn biên dịch đúng version của nó. JDK được tự dò từ sdkman, JVM hệ thống.
 - **Lombok** dùng jar có sẵn trong package jdtls của Mason, không cần tải thêm.

@@ -1,6 +1,6 @@
 -- lua/plugins/outline.lua — Outline cấu trúc file (aerial)
 -- Xem nhanh danh sách class / function / method để navigate trong file dài.
--- Backend treesitter -> CHẠY ĐƯỢC KHI LSP TẮT (đúng gu: LSP mặc định off).
+-- Backend treesitter -> vẫn chạy được khi LSP tắt.
 
 return {
   {

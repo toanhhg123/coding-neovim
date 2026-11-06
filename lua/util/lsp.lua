@@ -3,7 +3,7 @@
 
 local M = {}
 
-M.enabled = false     -- trạng thái mặc định: TẮT (bật bằng <leader>cl / :LspEnable)
+M.enabled = true      -- trạng thái mặc định: BẬT (tắt bằng <leader>cl / :LspDisable)
 M.servers = {}        -- danh sách server generic
 
 local function notify(on)
@@ -30,7 +30,7 @@ function M.set(on)
   M.enabled = on
 
   if on then
-    -- LSP mặc định tắt nên chỉ nạp lspconfig/mason/spring khi thật sự bật, startup không tốn gì
+    -- Có thể đang bật lại sau khi tắt, hoặc chưa mở file nào
     require("lazy").load({ plugins = { "nvim-lspconfig", "spring-boot.nvim" } })
     vim.lsp.config("*", { capabilities = M.capabilities() })
   end
@@ -65,8 +65,26 @@ function M.toggle()
   M.set(not M.enabled)
 end
 
--- Đăng ký lệnh :LspToggle / :LspEnable / :LspDisable (gọi 1 lần từ lsp.lua)
-function M.setup_commands()
+-- Đăng ký lệnh + áp dụng trạng thái mặc định (gọi 1 lần từ config/keymaps.lua)
+function M.setup()
+  -- Thoát khi server còn đang khởi tạo: Neovim không dừng được, jdtls sẽ sống tiếp và chiếm RAM
+  vim.api.nvim_create_autocmd("VimLeavePre", {
+    callback = function()
+      for _, client in ipairs(vim.lsp.get_clients()) do
+        if not client.initialized then pcall(client.rpc.terminate) end
+      end
+    end,
+  })
+
+  -- Mặc định bật: chỉ nạp khi mở file đầu tiên, mở nvim không có file thì vẫn nhẹ
+  if M.enabled then
+    vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+      once = true,
+      callback = function()
+        require("lazy").load({ plugins = { "nvim-lspconfig", "spring-boot.nvim" } })
+      end,
+    })
+  end
   vim.api.nvim_create_user_command("LspToggle", function() M.toggle() end, { desc = "Bật/tắt toàn bộ LSP" })
   vim.api.nvim_create_user_command("LspEnable", function() M.set(true) end, { desc = "Bật toàn bộ LSP" })
   vim.api.nvim_create_user_command("LspDisable", function() M.set(false) end, { desc = "Tắt toàn bộ LSP" })

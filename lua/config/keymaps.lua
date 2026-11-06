@@ -48,4 +48,4 @@ map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Terminal -> normal mode" })
 
 -- === LSP: bật/tắt toàn bộ ===
 map("n", "<leader>cl", function() require("util.lsp").toggle() end, { desc = "LSP: bật/tắt toàn bộ" })
-require("util.lsp").setup_commands() -- :LspToggle / :LspEnable / :LspDisable
+require("util.lsp").setup() -- :LspToggle / :LspEnable / :LspDisable + trạng thái mặc định

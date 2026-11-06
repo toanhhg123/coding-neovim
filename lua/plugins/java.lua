@@ -1,5 +1,5 @@
 -- lua/plugins/java.lua — Java / Spring Boot
--- nvim-jdtls: LSP Java + Lombok + debug + test (bật bằng <leader>cl vì LSP mặc định tắt)
+-- nvim-jdtls: LSP Java + Lombok + debug + test (tắt/bật bằng <leader>cl)
 -- spring-boot.nvim: gợi ý application.yml/properties, tra bean/endpoint qua LSP
 -- Lệnh chạy app/test không cần LSP nằm trong lua/util/spring.lua (<leader>j).
 
@@ -168,7 +168,7 @@ return {
   -- Gợi ý application.yml/properties + tra bean/endpoint (chạy cùng LSP, chỉ với project Spring Boot)
   {
     "JavaHello/spring-boot.nvim",
-    lazy = true, -- nạp từ util/lsp.lua lúc bật LSP
+    lazy = true, -- nạp từ util/lsp.lua
     config = function()
       require("spring_boot").setup({
         auto_enable = false, -- bật/tắt theo util/lsp.lua
