@@ -13,7 +13,7 @@ return {
 
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
+    lazy = true, -- nạp từ util/lsp.lua lúc bật LSP
     dependencies = {
       { "williamboman/mason.nvim" },
       { "williamboman/mason-lspconfig.nvim" },
@@ -39,13 +39,16 @@ return {
         jsonls = {},
         yamlls = {},
         bashls = {},
+        -- Backend: pom.xml/XML, Dockerfile, docker-compose
+        lemminx = {},
+        dockerls = {},
+        docker_compose_language_service = {},
         -- Java: KHÔNG setup ở đây (jdtls cần plugin riêng nvim-jdtls).
         -- Xem lua/plugins/java.lua.
       }
 
       require("mason-lspconfig").setup({
         ensure_installed = vim.tbl_keys(servers),
-        automatic_installation = true,
         automatic_enable = false, -- tự setup thủ công bên dưới (tránh bật 2 lần)
       })
 
@@ -80,6 +83,11 @@ return {
           map("gi", ok and tb.lsp_implementations or vim.lsp.buf.implementation, "Implementations")
           map("gy", ok and tb.lsp_type_definitions or vim.lsp.buf.type_definition, "Type definition")
           map("gD", vim.lsp.buf.declaration, "Khai báo")
+          -- Luồng gọi & kế thừa (đọc code Spring: ai gọi service này, class nào implement)
+          map("<leader>ci", ok and tb.lsp_incoming_calls or vim.lsp.buf.incoming_calls, "Ai gọi hàm này")
+          map("<leader>cI", ok and tb.lsp_outgoing_calls or vim.lsp.buf.outgoing_calls, "Hàm này gọi những gì")
+          map("<leader>ch", function() vim.lsp.buf.typehierarchy("subtypes") end, "Class con / implement")
+          map("<leader>cH", function() vim.lsp.buf.typehierarchy("supertypes") end, "Class cha / interface")
           -- Đọc thông tin
           map("K", vim.lsp.buf.hover, "Hover (xem doc/type)")
           -- Sửa nhanh
@@ -95,8 +103,7 @@ return {
       })
 
       -- ===== Setup từng server (API native nvim 0.11) =====
-      -- capabilities chung cho mọi server
-      vim.lsp.config("*", { capabilities = vim.lsp.protocol.make_client_capabilities() })
+      -- capabilities chung được đặt lúc bật LSP (xem util/lsp.lua)
       -- override riêng từng server (nvim-lspconfig cung cấp config nền lsp/<name>.lua)
       for name, opts in pairs(servers) do
         if next(opts) ~= nil then
@@ -105,12 +112,8 @@ return {
       end
       -- Bật/tắt toàn bộ LSP: :LspToggle/:LspEnable/:LspDisable + <leader>cl
       local toggle = require("util.lsp")
-      toggle.servers = vim.tbl_keys(servers)
-      toggle.setup_commands()
-      -- Áp dụng trạng thái mặc định (mặc định TẮT -> không auto-enable ở đây)
-      if toggle.enabled then
-        vim.lsp.enable(toggle.servers)
-      end
+      -- Mặc định TẮT: register chỉ ghi nhận, chưa khởi động server nào
+      toggle.register(vim.tbl_keys(servers))
     end,
   },
 }

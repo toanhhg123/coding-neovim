@@ -7,8 +7,8 @@
 
 ## 1. Triết lý & phạm vi
 
-Đây **không** phải một full IDE. Việc check lỗi / debug / develop nặng đã có IDE riêng lo.
-Neovim ở đây đóng vai trò một **"code cockpit" nhẹ, di động**:
+Đây là môi trường để **tự học và tự viết code**, trọng tâm là JS/TS và Java/Spring Boot.
+Công cụ nặng (LSP, debug) chỉ nạp khi cần, nên Neovim vẫn là một **"code cockpit" nhẹ, di động**:
 
 - 🪶 **Nhẹ & nhanh**: khởi động < 100ms, lazy-load tối đa, ít plugin nặng.
 - 🌍 **Cross-OS**: chạy giống nhau trên macOS / Linux / WSL. Không phụ thuộc binary khó cài.
@@ -17,10 +17,10 @@ Neovim ở đây đóng vai trò một **"code cockpit" nhẹ, di động**:
 - 📖 **Dễ đọc code**: highlight tốt, điều hướng definition/reference, đọc diff, đọc git blame.
 - 🎓 **Tự học**: mọi thao tác do người dùng tự làm, repo không tích hợp công cụ AI.
 
-### Không nằm trong phạm vi (để riêng cho IDE chính)
-- Debugger nặng (DAP), test runner phức tạp, linter/formatter bắt buộc.
-- Language tooling đầy đủ cho mọi ngôn ngữ. Chỉ giữ LSP **read-only-friendly**
-  (go-to-definition, hover, references) — không ép format/lint.
+### Không nằm trong phạm vi
+- Tích hợp công cụ AI vào config (AI CLI, plugin AI). Mặc định có sẵn của thư viện thì giữ nguyên, không can thiệp.
+- Plugin cần license hoặc tải backend đóng gói riêng.
+- Format-on-save, linter bắt buộc.
 
 ---
 
@@ -52,6 +52,10 @@ Neovim ở đây đóng vai trò một **"code cockpit" nhẹ, di động**:
 │       ├── treesitter.lua    # highlight + textobjects
 │       ├── lsp.lua           # LSP tối giản (navigation-focused)
 │       ├── git.lua           # gitsigns, diffview, (neogit tùy chọn)
+│       ├── java.lua          # jdtls + Spring LS
+│       ├── debug.lua         # nvim-dap (chỉ nạp khi debug)
+│       ├── completion.lua    # blink.cmp
+│       ├── backend.lua       # dadbod + curl.nvim
 │       └── terminal.lua      # terminal nhanh (toggleterm)
 ├── DESIGN.md                # tài liệu này
 └── README.md                # hướng dẫn cài đặt & phím tắt
@@ -147,7 +151,8 @@ Chúng ta build **tăng dần**, mỗi bước chạy được & commit riêng:
 - [x] colorscheme (Tokyonight trong suốt) + file explorer (neo-tree) + markdown preview
 - [x] nvim-jdtls cho Java/Spring (Java 21 + Lombok) + toggle bật/tắt toàn bộ LSP (mặc định TẮT)
 - [x] Extra — grug-far (search & replace project) · aerial (outline treesitter) · nvim-autopairs · git-conflict
-- [ ] còn lại (tùy chọn) — completion (blink/cmp), trouble, harpoon, flash
+- [x] Spring Boot — jdtls + Spring LS, chạy app/test (`util/spring.lua`), nvim-dap, blink.cmp, dadbod, curl.nvim
+- [ ] còn lại (tùy chọn) — trouble, harpoon, flash
 
 ---
 

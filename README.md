@@ -21,6 +21,7 @@ search và lập trình trong workflow **tmux**. Không dùng công cụ AI.
 - [x] Bước 5 — Git (gitsigns + diffview) ✅
 - [x] Bước 7 — tmux (vim-tmux-navigator + config mới + sessionizer BE/FE/job) ✅
 - [x] Extra — Search&Replace (grug-far) · Outline (aerial) · autopairs · git-conflict ✅
+- [x] Spring Boot — jdtls + Spring LS · chạy app/test · debug · completion · database · curl ✅
 - [ ] ... (xem DESIGN.md §7)
 
 ### tmux
@@ -80,7 +81,7 @@ Dùng `nvim-treesitter` nhánh `main` (bắt buộc với Neovim 0.12), cần `t
 ### LSP (điều hướng & hiểu code)
 
 Tối giản, tập trung **đọc/hiểu code** — không format-on-save, không ép lint.
-Server tự cài qua `:Mason`. Đã có: Lua, JS/TS, HTML/CSS, Tailwind, JSON, YAML, Bash, Java (cơ bản).
+Server tự cài qua `:Mason`. Đã có: Lua, JS/TS, HTML/CSS, Tailwind, JSON, YAML, Bash, Java, Spring, XML/pom, Docker.
 
 | Phím | Chức năng |
 |---|---|
@@ -99,22 +100,80 @@ Server tự cài qua `:Mason`. Đã có: Lua, JS/TS, HTML/CSS, Tailwind, JSON, Y
 Bật/tắt toàn bộ LSP còn có lệnh: `:LspToggle` · `:LspEnable` · `:LspDisable`
 (tắt = dừng mọi client kể cả jdtls + chặn tự attach; bật = gắn lại các buffer đang mở).
 
-> ⚙️ **Mặc định LSP TẮT** khi khởi động (đọc code nhẹ, không giật). Bật khi cần
+> ⚙️ **Mặc định LSP TẮT** khi khởi động (đọc code nhẹ, mason/lspconfig chỉ nạp khi bật). Bật khi cần
 > điều hướng/hiểu code bằng `Space c l` hoặc `:LspEnable`. Đổi mặc định ở
 > `M.enabled` trong `lua/util/lsp.lua`.
 
 - Quản lý server: `:Mason` (cài/gỡ). Xem trạng thái LSP: `:checkhealth lsp`.
-- **Java / Spring**: qua `nvim-jdtls` (chạy bằng Java 21), cấu hình trong
-  `lua/plugins/java.lua`. Lần đầu mở file `.java` jdtls sẽ **import project
-  (Maven/Gradle) — mất ~1-2 phút** tải sources/dependencies; sau đó `gd`/`K`/`gr`
-  hoạt động bình thường. Đổi đường dẫn JDK trong file đó nếu máy khác.
-- **Lombok**: jdtls cần lombok.jar làm javaagent (hiểu getter/setter/builder sinh tự động).
-  Đặt jar tại `~/.local/share/nvim/lombok.jar`. Lấy nhanh từ maven cache:
-  ```bash
-  cp ~/.m2/repository/org/projectlombok/lombok/*/lombok-*.jar ~/.local/share/nvim/lombok.jar
-  # hoặc tải: curl -L https://projectlombok.org/downloads/lombok.jar -o ~/.local/share/nvim/lombok.jar
-  ```
-  Thiếu jar thì jdtls vẫn chạy, chỉ là không hiểu code Lombok.
+- **Java / Spring**: xem mục [Spring Boot](#spring-boot) bên dưới.
+
+### Spring Boot
+
+Nhóm phím `Space j`. Phần lớn **không cần LSP**: chạy trực tiếp bằng wrapper của project
+(`mvnw`/`gradlew`, không có thì `mvn`/`gradle`) trong tmux pane dưới Neovim, ngoài tmux thì mở
+terminal split. `JAVA_HOME` tự đặt đúng version trong `pom.xml`/`build.gradle`.
+
+| Phím | Chức năng | Cần LSP |
+|---|---|---|
+| `Space j r` / `Space j R` | Chạy app (nhớ profile đã chọn) / chọn lại profile | |
+| `Space j D` | Chạy app ở chế độ debug (cổng 5005) | |
+| `Space j q` | Dừng app | |
+| `Space j t` / `Space j n` | Test class hiện tại / method dưới con trỏ | |
+| `Space j T` | Test toàn bộ | |
+| `Space j m` | Lệnh Maven/Gradle: `dependency:tree`, `flyway:*`, `package`... | |
+| `Space j a` | Nhảy class ↔ test (chưa có test thì mở khung JUnit 5, chưa lưu) | |
+| `Space j e` / `Space j b` | Tìm endpoint / bean | |
+| `Space j y` | Mở file trong `src/main/resources` | |
+| `Space j k` | Docker (lazydocker) | |
+| `Space j o` | Sắp xếp import | ✓ |
+| `Space j v` / `Space j C` | Tách biến / hằng số (dùng được ở visual) | ✓ |
+| `Space j x` | Tách method (visual) | ✓ |
+| `Space j U` | Cập nhật project sau khi sửa `pom.xml` | ✓ |
+| `Space j s` | Tra bean/endpoint qua Spring LS | ✓ |
+| `Space c i` / `Space c I` | Ai gọi hàm này / hàm này gọi gì | ✓ |
+| `Space c h` / `Space c H` | Class con, implement / class cha, interface | ✓ |
+
+Khi bật LSP (`Space c l`):
+- **jdtls** chạy bằng JDK mới nhất có trên máy (**jdtls 1.63 cần Java 25**, không khởi động được
+  trên Java 21); project vẫn biên dịch đúng version của nó. JDK được tự dò từ sdkman, JVM hệ thống.
+- **Lombok** dùng jar có sẵn trong package jdtls của Mason, không cần tải thêm.
+- **Spring LS** gợi ý `application.yml`/`.properties`. Cần đang có jdtls: mở một file `.java` trước.
+  Khi bật LSP sẽ thấy dòng "Embedded Spring Tools MCP server started": đây là mặc định của Spring LS,
+  chỉ nhận kết nối nội bộ, không ảnh hưởng gì khi code.
+- Lần đầu mở project, jdtls cần import. `buktour_service` mất khoảng 40 giây.
+
+### Debug (nvim-dap)
+
+Java cần bật LSP và đợi jdtls import xong.
+
+| Phím | Chức năng |
+|---|---|
+| `Space d b` / `Space d B` | Breakpoint / có điều kiện |
+| `Space d a` | **Attach vào app** đang chạy từ `Space j D` |
+| `Space d c` hoặc `F9` | Bắt đầu / tiếp tục (chọn main class) |
+| `F8` / `F7` / `Shift-F8` | Step over / into / out (giống IntelliJ) · cũng có `Space d n/i/o` |
+| `Space d T` / `Space d N` | Debug test class / test method |
+| `Space d e` | Xem giá trị biểu thức |
+| `Space d u` / `Space d r` | Bật/tắt giao diện debug / REPL |
+| `Space d l` / `Space d q` | Chạy lại lần trước / dừng debug |
+
+### Gợi ý code (blink.cmp)
+
+Trong Insert: `Enter` nhận gợi ý, `Ctrl-j/k` di chuyển, `Tab` qua ô tiếp theo của snippet.
+LSP tắt thì vẫn gợi ý từ path, snippet và buffer. File SQL có gợi ý theo database đang kết nối.
+
+### Database (dadbod) & gọi API (curl.nvim)
+
+| Phím | Chức năng |
+|---|---|
+| `Space D d` | Bật/tắt giao diện database |
+| `Space D a` | Thêm kết nối, vd `postgresql://user@localhost:5432/db` |
+| `Space D f` | Gắn file SQL hiện tại vào một kết nối |
+| `Space h h` / `Space h g` | Bảng curl của project / dùng chung |
+| `Space h c` / `Space h q` | Chọn bộ request đã lưu / đóng bảng |
+
+- Kết nối DB lưu ở thư mục data của Neovim, không nằm trong repo. Cần client của DB, vd `psql`.
+- Bảng curl: viết lệnh `curl` ở khung trái, `Enter` để chạy, kết quả ở khung phải.
 
 ### Markdown
 
@@ -229,6 +288,10 @@ Sẽ được bổ sung dần khi build. Dự kiến:
 | `tmux` ≥ 3.3 | Session BE/FE/job | `brew install tmux` |
 | `fzf` | Sessionizer | `brew install fzf` |
 | `node` | Một số LSP | — |
+| JDK 25 + JDK của project | Chạy jdtls / biên dịch | `sdk install java` |
+| `jq` | Kết quả curl.nvim | `brew install jq` |
+| `lazydocker` | Docker (tùy chọn) | `brew install lazydocker` |
+| `psql` | Database Postgres (tùy chọn) | `brew install libpq` |
 
 ---
 
@@ -261,6 +324,10 @@ nvim
 | `<leader>g` | Git |
 | `<leader>t` | Terminal |
 | `<leader>c` | Code / LSP / Outline |
+| `<leader>j` | Java / Spring |
+| `<leader>d` | Debug |
+| `<leader>D` | Database |
+| `<leader>h` | HTTP (curl) |
 | `Ctrl-h/j/k/l` | Nhảy giữa split & tmux pane |
 
 `leader` = `Space`.
