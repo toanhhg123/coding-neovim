@@ -67,15 +67,6 @@ end
 
 -- Đăng ký lệnh + áp dụng trạng thái mặc định (gọi 1 lần từ config/keymaps.lua)
 function M.setup()
-  -- Thoát khi server còn đang khởi tạo: Neovim không dừng được, jdtls sẽ sống tiếp và chiếm RAM
-  vim.api.nvim_create_autocmd("VimLeavePre", {
-    callback = function()
-      for _, client in ipairs(vim.lsp.get_clients()) do
-        if not client.initialized then pcall(client.rpc.terminate) end
-      end
-    end,
-  })
-
   -- Mặc định bật: chỉ nạp khi mở file đầu tiên, mở nvim không có file thì vẫn nhẹ
   if M.enabled then
     vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
