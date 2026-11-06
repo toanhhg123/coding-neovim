@@ -48,6 +48,26 @@ return {
           ["P"] = { "toggle_preview", config = { use_float = true } },
         },
       },
+      -- Tạo file xong thì mở luôn ở cửa sổ code. Sự kiện này cũng phát khi tạo thư mục và
+      -- khi copy, nên chỉ mở file trống (file mới tạo luôn trống)
+      event_handlers = {
+        {
+          event = "file_added",
+          handler = function(path)
+            if vim.fn.getfsize(path) ~= 0 then return end
+            vim.schedule(function()
+              for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+                local buf = vim.api.nvim_win_get_buf(win)
+                if vim.bo[buf].filetype ~= "neo-tree" and vim.api.nvim_win_get_config(win).relative == "" then
+                  vim.api.nvim_set_current_win(win)
+                  vim.cmd.edit(vim.fn.fnameescape(path))
+                  return
+                end
+              end
+            end)
+          end,
+        },
+      },
       filesystem = {
         bind_to_cwd = true,
         follow_current_file = { enabled = true }, -- tự highlight file đang mở

@@ -133,6 +133,10 @@ terminal split. `JAVA_HOME` tự đặt đúng version trong `pom.xml`/`build.gr
 | `Space c i` / `Space c I` | Ai gọi hàm này / hàm này gọi gì | ✓ |
 | `Space c h` / `Space c H` | Class con, implement / class cha, interface | ✓ |
 
+**Tạo file Java:** mở một file `.java` trống là tự có `package` (theo đường dẫn sau `src/main/java` hoặc
+`src/test/java`) và `class` theo tên file. Tạo bằng neo-tree (`a`, file mở luôn) hay `:e` đều được, không cần LSP.
+Nội dung chưa lưu, `:w` để lưu.
+
 Khi LSP đang bật:
 - **jdtls** chạy bằng JDK mới nhất có trên máy (**jdtls 1.63 cần Java 25**, không khởi động được
   trên Java 21); project vẫn biên dịch đúng version của nó. JDK được tự dò từ sdkman, JVM hệ thống.
