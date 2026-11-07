@@ -65,6 +65,7 @@ return {
       { "<F8>", dap("step_over"), desc = "Debug: step over" },
       { "<F7>", dap("step_into"), desc = "Debug: step into" },
       { "<S-F8>", dap("step_out"), desc = "Debug: step out" },
+      { "<F20>", dap("step_out"), desc = "Debug: step out (Shift+F8 qua tmux)" },
     },
     config = function()
       local d, ui = require("dap"), require("dapui")

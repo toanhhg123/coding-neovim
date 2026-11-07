@@ -45,6 +45,49 @@ Prefix mặc định: **`Ctrl-t`**.
   (đổi bằng biến `TMUX_SESSIONIZER_PATHS`). Cần `fzf` (+ `fd` nếu có).
 - Đã bật `focus-events` (Neovim autoread trong tmux) + true color.
 
+### Phím tắt IntelliJ
+
+Dùng `Cmd` như IntelliJ trên macOS, song song với nhóm phím `Space` (không phím `Space` nào bị bỏ).
+Terminal không truyền được `Cmd`, nên cần profile iTerm trong repo: nó đổi `Cmd+phím` thành `Alt+phím`
+để đi qua tmux tới Neovim. Khai báo phím ở [lua/config/intellij.lua](lua/config/intellij.lua).
+
+Cài đặt: chép profile rồi chọn `coding-neovim` trong iTerm (Settings → Profiles → Other Actions → Set as Default).
+
+```bash
+cp iterm/coding-neovim.json ~/Library/Application\ Support/iTerm2/DynamicProfiles/
+```
+
+| Phím | Chức năng | Phím | Chức năng |
+|---|---|---|---|
+| `Cmd+B` | Tới định nghĩa | `Cmd+O` | Tìm class |
+| `Cmd+Alt+B` | Implementations | `Cmd+Shift+O` | Tìm file |
+| `Alt+F7` | Tìm nơi dùng | `Cmd+Alt+O` | Tìm symbol |
+| `Cmd+U` | Class cha | `Cmd+E` | File gần đây |
+| `F1` | Xem tài liệu | `Cmd+F` | Tìm trong file |
+| `Cmd+P` | Tham số của hàm | `Cmd+Shift+F` | Tìm trong project |
+| `F2` / `Shift+F2` | Lỗi kế tiếp / trước | `Cmd+R` | Thay thế trong file |
+| `Cmd+[` / `Cmd+]` | Lùi / tiến vị trí | `Cmd+Shift+R` | Thay thế trong project |
+| `Alt+Enter` | Sửa nhanh | `Cmd+1` | Cây thư mục |
+| `Shift+F6` | Đổi tên | `Cmd+9` | Thay đổi git |
+| `Cmd+Alt+L` | Format | `Cmd+F12` | Cấu trúc file |
+| `Ctrl+Alt+O` | Sắp xếp import | `Cmd+F4` | Đóng tab |
+| `Cmd+N` | Sinh code | `Cmd+Shift+[` / `]` | Tab trước / sau |
+| `Cmd+/` | Comment | `Shift+F10` | Chạy app |
+| `Cmd+D` | Nhân đôi dòng | `Shift+F9` | Chạy app chế độ debug |
+| `Cmd+Backspace` | Xoá dòng | `Cmd+F2` | Dừng app |
+| `Alt+Shift+Up/Down` | Chuyển dòng | `Cmd+Shift+F10` | Chạy test class |
+| `Cmd+W` / `Cmd+Shift+W` | Chọn rộng ra / hẹp lại | `Cmd+Shift+T` | Nhảy class ↔ test |
+| `Cmd+S` | Lưu | `Cmd+F8` | Breakpoint |
+| `Cmd+Z` / `Cmd+Shift+Z` | Hoàn tác / làm lại | `F7` `F8` `F9` `Shift+F8` | Into / over / tiếp tục / out |
+| `Cmd+A` | Chọn tất cả | | |
+
+Lưu ý:
+- Không có `Shift Shift` (terminal không nhận được) và các phím `Ctrl` trùng với tmux hoặc Vim.
+- Trong profile này các phím trên không còn làm việc của iTerm: `Cmd+W` không đóng tab, `Cmd+D` không chia pane,
+  `Cmd+F` không tìm trong iTerm. Ngoài Neovim chúng gửi `Alt+phím`, vd trong zsh `Cmd+B` lùi một từ.
+  `Cmd+C`, `Cmd+V`, `Cmd+T`, `Cmd+Q` giữ nguyên. Muốn đổi lại, chọn lại profile `Default`.
+- `F1`, `F2`... trên bàn phím Mac có thể cần giữ `fn`.
+
 ### Terminal
 
 | Phím | Chức năng |
@@ -342,6 +385,7 @@ nvim
 | `<leader>d` | Debug |
 | `<leader>D` | Database |
 | `<leader>h` | HTTP (curl) |
+| `Cmd+...` | Phím theo IntelliJ, xem mục [Phím tắt IntelliJ](#phím-tắt-intellij) |
 | `Ctrl-h/j/k/l` | Nhảy giữa split & tmux pane |
 
 `leader` = `Space`.

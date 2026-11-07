@@ -5,6 +5,7 @@
 -- 1) Options + keymaps + autocmds cơ bản (không phụ thuộc plugin)
 require("config.options")
 require("config.keymaps")
+require("config.intellij")
 require("config.autocmds")
 vim.cmd.colorscheme("iterm") -- colors/iterm.lua, cần có trước khi plugin UI nạp
 
