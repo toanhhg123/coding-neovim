@@ -30,7 +30,7 @@ require("lazy").setup({
   },
   install = {
     -- colorscheme dùng khi cài lần đầu; sẽ thay bằng scheme thật ở Bước 2
-    colorscheme = { "habamax" },
+    colorscheme = { "iterm" },
   },
   ui = { border = "rounded" },
   checker = {

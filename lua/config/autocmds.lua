@@ -57,7 +57,7 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- === File .java trống: tự điền package + class ===
+-- === File .java trống: tự điền khung theo tên file (xem util/java.lua) ===
 -- Dùng BufReadPost vì neo-tree tạo file trên đĩa trước rồi mới mở (không phát BufNewFile).
 vim.api.nvim_create_autocmd({ "BufNewFile", "BufReadPost" }, {
   group = augroup("java_skeleton"),
@@ -69,13 +69,7 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufReadPost" }, {
 
     local path = vim.api.nvim_buf_get_name(buf)
     if path:match("^%a+://") then return end -- source thư viện qua jdt://
-    local name = vim.fn.fnamemodify(path, ":t:r")
-    local body = { "public class " .. name .. " {", "", "}" }
-    local package = path:match("/src/[^/]+/java/(.+)/[^/]+$")
-    if package then
-      table.insert(body, 1, "")
-      table.insert(body, 1, "package " .. package:gsub("/", ".") .. ";")
-    end
+    local body = require("util.java").skeleton(path)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, body)
     if vim.api.nvim_get_current_buf() == buf then
       vim.api.nvim_win_set_cursor(0, { #body - 1, 0 }) -- con trỏ ở thân class

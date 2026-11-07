@@ -13,7 +13,7 @@ search và lập trình trong workflow **tmux**. Không dùng công cụ AI.
 
 - [x] Bước 0 — Khởi tạo repo & tài liệu
 - [x] Bước 1 — Bootstrap lazy.nvim + config cơ bản (options/keymaps/autocmds) — startup ~18ms
-- [x] Bước 2 — UI nền tảng: which-key + lualine + bufferline + colorscheme (Tokyonight, trong suốt) ✅
+- [x] Bước 2 — UI nền tảng: which-key + lualine + bufferline + colorscheme theo iTerm (trong suốt) ✅
 - [x] Bước 3 — Search & Navigation (Telescope + fzf-native) ✅
 - [x] Bước 4 — Treesitter (highlight + textobjects) ✅
 - [x] Bước 8 — LSP tối giản (mason + lspconfig, navigation-focused) ✅
@@ -134,7 +134,18 @@ terminal split. `JAVA_HOME` tự đặt đúng version trong `pom.xml`/`build.gr
 | `Space c h` / `Space c H` | Class con, implement / class cha, interface | ✓ |
 
 **Tạo file Java:** mở một file `.java` trống là tự có `package` (theo đường dẫn sau `src/main/java` hoặc
-`src/test/java`) và `class` theo tên file. Tạo bằng neo-tree (`a`, file mở luôn) hay `:e` đều được, không cần LSP.
+`src/test/java`) và `class` theo tên file. Trong `src/main`, khung đổi theo hậu tố tên file:
+
+| Hậu tố | Khung |
+|---|---|
+| `Controller` | `@RestController` |
+| `Service` | `@Service` |
+| `Repository` | `@Repository` + `interface` |
+| `Config`, `Configuration` | `@Configuration` |
+| `Component` | `@Component` |
+
+Controller và Service có thêm `@RequiredArgsConstructor` nếu project dùng Lombok.
+ Tạo bằng neo-tree (`a`, file mở luôn) hay `:e` đều được, không cần LSP.
 Nội dung chưa lưu, `:w` để lưu.
 
 Khi LSP đang bật:
@@ -257,13 +268,12 @@ Danh sách **class / function / method** để nhảy nhanh trong file dài — 
 
 ### UI
 
-- **Colorscheme**: Tokyonight, **nền trong suốt** (thấy nền iTerm phía sau). Đổi tông
-  ở `style` trong `lua/plugins/colorscheme.lua` (`night`/`storm`/`moon`/`day`).
-  Transparent áp dụng bền kể cả khi đổi sang colorscheme khác.
+- **Colorscheme**: `colors/iterm.lua`, lấy từ bảng màu profile iTerm, nền trong suốt. Đổi profile thì sửa bảng `c`
+  đầu file. Terminal khác iTerm vẫn dùng được, chỉ là màu theo bảng này.
 - **which-key**: bấm `Space` rồi chờ ~0.3s → hiện bảng gợi ý phím theo nhóm (Find/Git/Java...).
   `Space ?` → xem phím tắt riêng của buffer hiện tại.
-- **lualine**: statusline hiện mode · nhánh git · diff · diagnostic · file · vị trí dòng:cột.
-- **bufferline**: thanh tab các file đang mở ở trên cùng.
+- **lualine**: chỉ có chữ, không nền: mode · nhánh git · file · diagnostic · filetype · dòng:cột.
+- **bufferline**: tab các file đang mở, tab hiện tại chữ sáng, không viền. Ẩn khi chỉ có 1 file.
 - **autopairs**: tự đóng ngoặc/quote theo ngữ cảnh treesitter. `Alt-e` bọc nhanh phần còn lại của dòng vào ngoặc.
 
 | Phím | Tab (file đang mở) |

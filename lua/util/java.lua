@@ -118,6 +118,61 @@ function M.jdtls_config_dir(mason_jdtls)
   return vim.fs.joinpath(mason_jdtls, "config_" .. os_name .. ((arm and os_name ~= "win") and "_arm" or ""))
 end
 
+-- Khung file theo hậu tố tên class (chỉ áp dụng trong src/main)
+local STEREOTYPES = {
+  { suffix = "Controller", annotation = "RestController", import = "org.springframework.web.bind.annotation.RestController", inject = true },
+  { suffix = "Service", annotation = "Service", import = "org.springframework.stereotype.Service", inject = true },
+  { suffix = "Repository", annotation = "Repository", import = "org.springframework.stereotype.Repository", kind = "interface" },
+  { suffix = "Configuration", annotation = "Configuration", import = "org.springframework.context.annotation.Configuration" },
+  { suffix = "Config", annotation = "Configuration", import = "org.springframework.context.annotation.Configuration" },
+  { suffix = "Component", annotation = "Component", import = "org.springframework.stereotype.Component" },
+}
+
+local function uses_lombok(path)
+  local root = vim.fs.root(path, { "pom.xml", "build.gradle", "build.gradle.kts" })
+  if not root then return false end
+  for _, name in ipairs({ "pom.xml", "build.gradle", "build.gradle.kts" }) do
+    local file = vim.fs.joinpath(root, name)
+    if vim.fn.filereadable(file) == 1 and table.concat(vim.fn.readfile(file), "\n"):find("lombok", 1, true) then
+      return true
+    end
+  end
+  return false
+end
+
+--- Nội dung khởi đầu của một file .java trống.
+function M.skeleton(path)
+  local name = vim.fn.fnamemodify(path, ":t:r")
+  local package = path:match("/src/[^/]+/java/(.+)/[^/]+$")
+  local kind, annotations, imports = "public class", {}, {}
+
+  if path:find("/src/main/java/", 1, true) then
+    for _, item in ipairs(STEREOTYPES) do
+      if name ~= item.suffix and vim.endswith(name, item.suffix) then
+        table.insert(imports, item.import)
+        table.insert(annotations, "@" .. item.annotation)
+        if item.kind then kind = "public " .. item.kind end
+        if item.inject and uses_lombok(path) then
+          table.insert(imports, "")
+          table.insert(imports, "lombok.RequiredArgsConstructor")
+          table.insert(annotations, "@RequiredArgsConstructor")
+        end
+        break
+      end
+    end
+  end
+
+  local lines = {}
+  if package then vim.list_extend(lines, { "package " .. package:gsub("/", ".") .. ";", "" }) end
+  for _, import in ipairs(imports) do
+    table.insert(lines, import == "" and "" or ("import " .. import .. ";"))
+  end
+  if #imports > 0 then table.insert(lines, "") end
+  vim.list_extend(lines, annotations)
+  vim.list_extend(lines, { kind .. " " .. name .. " {", "", "}" })
+  return lines
+end
+
 --- Cài các package Mason còn thiếu (chạy nền, xong thì báo).
 function M.ensure_mason(names, on_done)
   local ok, registry = pcall(require, "mason-registry")

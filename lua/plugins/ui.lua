@@ -46,45 +46,55 @@ return {
     },
   },
 
+  -- Icon một màu để cùng tông với giao diện
+  { "nvim-tree/nvim-web-devicons", lazy = true, opts = { color_icons = false } },
+
   -- ============================================================
-  -- lualine: statusline nhẹ, hiện mode / git / diagnostic / vị trí
+  -- lualine: statusline chỉ có chữ, không khối màu, không nền
   -- ============================================================
   {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
-    dependencies = { "nvim-tree/nvim-web-devicons" }, -- icon (cần Nerd Font)
-    opts = {
-      options = {
-        theme = "auto",             -- tự khớp với colorscheme đang dùng
-        globalstatus = true,        -- 1 statusline chung cho mọi split -> gọn
-        component_separators = { left = "│", right = "│" },
-        section_separators = { left = "", right = "" },
-        disabled_filetypes = {
-          statusline = { "alpha", "neo-tree", "oil" },
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = function()
+      local gray = "#686868"
+      local function mode(color)
+        return {
+          a = { fg = color, bg = "NONE", gui = "bold" },
+          b = { fg = gray, bg = "NONE" },
+          c = { fg = gray, bg = "NONE" },
+        }
+      end
+      return {
+        options = {
+          theme = {
+            normal = mode("#00c5c7"),
+            insert = mode("#58e790"),
+            visual = mode("#e17ee1"),
+            replace = mode("#dd7975"),
+            command = mode("#c7c400"),
+            inactive = mode(gray),
+          },
+          globalstatus = true,
+          component_separators = "",
+          section_separators = "",
+          disabled_filetypes = { statusline = { "alpha", "oil" } },
         },
-      },
-      sections = {
-        lualine_a = { "mode" },
-        lualine_b = { "branch" },   -- nhánh git hiện tại
-        lualine_c = {
-          { "diff", symbols = { added = " ", modified = " ", removed = " " } },
-          { "diagnostics", sources = { "nvim_lsp" } },
-          { "filename", path = 1 }, -- path tương đối -> biết mình đang ở file nào trong project
+        sections = {
+          lualine_a = { "mode" },
+          lualine_b = { { "branch", icon = "" } },
+          lualine_c = { { "filename", path = 1, symbols = { modified = "●", readonly = "", unnamed = "" } } },
+          lualine_x = { { "diagnostics", sources = { "nvim_diagnostic" } } },
+          lualine_y = { { "filetype", colored = false, icon_only = false } },
+          lualine_z = { "location" },
         },
-        lualine_x = {
-          { "encoding" },
-          { "fileformat" },
-          { "filetype" },
-        },
-        lualine_y = { "progress" },
-        lualine_z = { "location" }, -- dòng:cột
-      },
-      extensions = { "lazy", "quickfix" },
-    },
+        extensions = { "lazy", "quickfix" },
+      }
+    end,
   },
 
   -- ============================================================
-  -- bufferline: thanh tab các file đang mở (trên cùng)
+  -- bufferline: tab các file đang mở, chỉ phân biệt bằng màu chữ
   -- ============================================================
   {
     "akinsho/bufferline.nvim",
@@ -107,22 +117,33 @@ return {
     },
     opts = {
       options = {
-        mode = "buffers",              -- mỗi file mở = 1 tab
-        diagnostics = "nvim_lsp",       -- hiện dấu lỗi/cảnh báo trên tab
-        separator_style = "slant",
-        show_buffer_close_icons = true,
+        mode = "buffers",
+        separator_style = { "", "" },
+        indicator = { style = "none" },
+        show_buffer_close_icons = false,
         show_close_icon = false,
-        always_show_bufferline = false, -- ẩn khi chỉ có 1 file cho gọn
-        offsets = {
-          {
-            filetype = "neo-tree",
-            text = "Explorer",
-            highlight = "Directory",
-            separator = true,
-          },
-        },
-        hover = { enabled = true, delay = 200, reveal = { "close" } },
+        color_icons = false,
+        always_show_bufferline = false,
+        -- Ẩn buffer trống [No Name]
+        custom_filter = function(buf)
+          return vim.api.nvim_buf_get_name(buf) ~= ""
+        end,
+        offsets = { { filetype = "neo-tree", text = "", separator = true } },
       },
+      highlights = function(defaults)
+        local gray, fg = "#686868", "#dcdcdc"
+        local result = {}
+        for name in pairs(defaults.highlights) do
+          -- Mọi thành phần: không nền, không in nghiêng; mặc định chữ xám
+          result[name] = { fg = gray, bg = "NONE", italic = false, bold = false, sp = "NONE" }
+        end
+        for _, name in ipairs({ "buffer_selected", "numbers_selected", "duplicate_selected", "pick_selected" }) do
+          result[name] = { fg = fg, bg = "NONE", bold = true, italic = false }
+        end
+        result.modified_selected = { fg = "#00c5c7", bg = "NONE" }
+        result.offset_separator = { fg = "#3a4048", bg = "NONE" }
+        return result
+      end,
     },
   },
 }

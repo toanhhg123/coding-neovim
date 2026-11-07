@@ -6,6 +6,7 @@
 require("config.options")
 require("config.keymaps")
 require("config.autocmds")
+vim.cmd.colorscheme("iterm") -- colors/iterm.lua, cần có trước khi plugin UI nạp
 
 -- 2) Bootstrap plugin manager (lazy.nvim) + nạp thư mục lua/plugins/
 require("config.lazy")
