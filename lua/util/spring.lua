@@ -107,11 +107,12 @@ local function run_in_tmux(kind, project, cmd)
     end
     panes[kind] = id
   end
-  tmux({ "send-keys", "-t", id, "-l", "cd " .. vim.fn.shellescape(root) .. " && " .. cmd })
-  tmux({ "send-keys", "-t", id, "Enter" })
+  local sent = tmux({ "send-keys", "-t", id, "-l", "cd " .. vim.fn.shellescape(root) .. " && " .. cmd })
+  if not sent or not tmux({ "send-keys", "-t", id, "Enter" }) then return nil end
+  return { kind = "tmux", id = id }
 end
 
-local function run_in_term(kind, project, cmd)
+local function run_in_term(kind, project, cmd, opts)
   local key = project_key(project)
   local terms = M._terms[key] or {}
   M._terms[key] = terms
@@ -124,27 +125,50 @@ local function run_in_term(kind, project, cmd)
   vim.cmd("botright 15new")
   local buf = vim.api.nvim_get_current_buf()
   local shell = vim.fn.has("win32") == 1 and { "cmd", "/c", cmd } or { vim.o.shell, "-c", cmd }
-  local job = vim.fn.jobstart(shell, { term = true, cwd = project.root })
+  local handle = { kind = "term", buf = buf }
+  local job_opts = { term = true, cwd = project.root }
+  if opts and opts.marker then
+    -- Output gốc không bị terminal xuống dòng khi cửa sổ hẹp.
+    handle.output = ""
+    job_opts.on_stdout = function(_, data)
+      handle.output = (handle.output .. table.concat(data, "\n")):sub(-65536)
+    end
+  end
+  local job = vim.fn.jobstart(shell, job_opts)
+  handle.job = job
   terms[kind] = { buf = buf, job = job }
   vim.api.nvim_set_current_win(current)
+  if job <= 0 then
+    vim.notify("Không chạy được lệnh trong terminal", vim.log.levels.ERROR, { title = "Spring" })
+    return nil
+  end
+  return handle
 end
 
 --- kind = "app" (app đang chạy) | "task" (test/build), để chạy test không giết app.
-function M.exec(kind, project, cmd)
+function M.exec(kind, project, cmd, opts)
   local full = with_jdk(project, cmd)
-  if vim.env.TMUX then
-    run_in_tmux(kind, project, full)
-  else
-    run_in_term(kind, project, full)
+  if opts and opts.marker then
+    local marker = vim.fn.shellescape(opts.marker)
+    local echo = vim.fn.has("win32") == 1 and ("echo " .. opts.marker) or ("printf '%s\\n' " .. marker)
+    full = echo .. " && " .. full
   end
+  local handle
+  if vim.env.TMUX then
+    handle = run_in_tmux(kind, project, full)
+  else
+    handle = run_in_term(kind, project, full, opts)
+  end
+  if not handle then return nil end
   -- redraw + cắt ngắn: sau menu chọn hoặc thông báo dài, Neovim sẽ hiện "Press ENTER" và nuốt phím kế tiếp
   vim.cmd.redraw()
   vim.notify(vim.fn.strcharpart(cmd, 0, vim.o.columns - 20), vim.log.levels.INFO, { title = "Spring" })
+  return handle
 end
 
 --- Dừng app của module hiện tại.
-function M.stop()
-  local project = require_project()
+function M.stop(project, silent)
+  project = project or (silent and M.project() or require_project())
   if not project then return end
   local key = project_key(project)
   local panes, terms = M._panes[key] or {}, M._terms[key] or {}
@@ -152,14 +176,14 @@ function M.stop()
     tmux({ "send-keys", "-t", panes.app, "C-c" })
   elseif terms.app then
     pcall(vim.fn.jobstop, terms.app.job)
-  else
+  elseif not silent then
     vim.notify("Chưa có app nào đang chạy", vim.log.levels.INFO, { title = "Spring" })
   end
 end
 
 -- ===== Chạy app =====
 
-local function run_cmd(project, profile, debug)
+local function run_cmd(project, profile, debug, suspend)
   local cmd = build_cmd(project)
   if project.maven then
     cmd = cmd .. " spring-boot:run"
@@ -167,7 +191,7 @@ local function run_cmd(project, profile, debug)
     if debug then
       cmd = cmd
         .. " -Dspring-boot.run.jvmArguments="
-        .. vim.fn.shellescape("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:" .. M.debug_port)
+        .. vim.fn.shellescape("-agentlib:jdwp=transport=dt_socket,server=y,suspend=" .. (suspend and "y" or "n") .. ",address=*:" .. M.debug_port)
     end
     return cmd
   end
@@ -194,15 +218,16 @@ end
 
 local NO_PROFILE, OTHER = "(không profile)", "Nhập tay..."
 
-local function pick_profile(project, callback)
+local function pick_profile(project, callback, on_cancel)
+  local function cancel() if on_cancel then on_cancel() end end
   local items = M.profiles(project)
   table.insert(items, 1, NO_PROFILE)
   table.insert(items, OTHER)
   vim.ui.select(items, { prompt = "Spring profile" }, function(choice)
-    if not choice then return end
+    if not choice then return cancel() end
     if choice == OTHER then
       vim.ui.input({ prompt = "Profile: " }, function(value)
-        if value and value ~= "" then callback(value) end
+        if value and value ~= "" then callback(value) else cancel() end
       end)
     else
       callback(choice ~= NO_PROFILE and choice or false)
@@ -210,24 +235,32 @@ local function pick_profile(project, callback)
   end)
 end
 
-local function start(debug, ask)
+local function start(debug, ask, opts)
+  opts = opts or {}
   local project = require_project()
-  if not project then return end
+  if not project then
+    if opts.on_cancel then opts.on_cancel() end
+    return
+  end
   local function go(profile)
+    if opts.can_start and not opts.can_start() then return end
     M._profiles[project.module] = profile
-    M.exec("app", project, run_cmd(project, profile or nil, debug))
+    local cmd = run_cmd(project, profile or nil, debug, opts.marker ~= nil)
+    local handle = M.exec("app", project, cmd, opts)
+    if handle and opts.on_started then opts.on_started(project, handle)
+    elseif not handle and opts.on_cancel then opts.on_cancel() end
   end
   local known = M._profiles[project.module]
   if known ~= nil and not ask then
     go(known)
   else
-    pick_profile(project, go)
+    pick_profile(project, go, opts.on_cancel)
   end
 end
 
 function M.run() start(false, false) end
 function M.run_pick_profile() start(false, true) end
-function M.run_debug() start(true, false) end
+function M.run_debug(opts) start(true, false, opts) end
 
 -- ===== Test =====
 

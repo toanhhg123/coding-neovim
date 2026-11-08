@@ -62,7 +62,7 @@ cp iterm/coding-neovim.json ~/Library/Application\ Support/iTerm2/DynamicProfile
 | `Cmd+B` | Tới định nghĩa | `Cmd+O` | Tìm class |
 | `Cmd+Alt+B` | Implementations | `Cmd+Shift+O` | Tìm file |
 | `Alt+F7` | Tìm nơi dùng | `Cmd+Alt+O` | Tìm symbol |
-| `Cmd+U` | Class cha | `Cmd+E` | File gần đây |
+| `Cmd+U` | Method cha (Java) / class cha | `Cmd+E` | File gần đây, kể cả đã đóng |
 | `F1` | Xem tài liệu | `Cmd+F` | Tìm trong file |
 | `Cmd+P` | Tham số của hàm | `Cmd+Shift+F` | Tìm trong project |
 | `F2` / `Shift+F2` | Lỗi kế tiếp / trước | `Cmd+R` | Thay thế trong file |
@@ -73,15 +73,20 @@ cp iterm/coding-neovim.json ~/Library/Application\ Support/iTerm2/DynamicProfile
 | `Ctrl+Alt+O` | Sắp xếp import | `Cmd+F4` | Đóng tab |
 | `Cmd+N` | Sinh code | `Cmd+Shift+[` / `]` | Tab trước / sau |
 | `Cmd+/` | Comment | `Shift+F10` | Chạy app |
-| `Cmd+D` | Nhân đôi dòng | `Shift+F9` | Chạy app chế độ debug |
-| `Cmd+Backspace` | Xoá dòng | `Cmd+F2` | Dừng app |
+| `Cmd+D` | Nhân đôi dòng / đúng vùng chọn | `Shift+F9` | Chạy app và tự attach debugger |
+| `Cmd+Backspace` | Xoá dòng | `Cmd+F2` | Dừng app / debugger / hủy chờ JVM |
 | `Alt+Shift+Up/Down` | Chuyển dòng | `Cmd+Shift+F10` | Chạy test class |
 | `Cmd+W` / `Cmd+Shift+W` | Chọn rộng ra / hẹp lại | `Cmd+Shift+T` | Nhảy class ↔ test |
 | `Cmd+S` | Lưu | `Cmd+F8` | Breakpoint |
 | `Cmd+Z` / `Cmd+Shift+Z` | Hoàn tác / làm lại | `F7` `F8` `F9` `Shift+F8` | Into / over / tiếp tục / out |
-| `Cmd+A` | Chọn tất cả | | |
+| `Cmd+A` | Chọn tất cả | `Cmd+Shift+A` | Tìm lệnh / hành động |
+| `Cmd+G` / `Cmd+Shift+G` | Kết quả tìm tiếp / trước | `Cmd+L` | Tới dòng hoặc `dòng:cột` |
+| `Cmd+Shift+B` | Tới khai báo kiểu | | |
 
 Lưu ý:
+- Các phím điều hướng, tìm kiếm, Run/Debug dùng được từ Normal và Insert; khi cần sẽ thoát Insert.
+- `Cmd+F` mở tìm kiếm `/` (regex Vim); `Cmd+G/Shift+G` tiếp tục cùng từ khóa. Tìm fuzzy trong file vẫn có `Space /`.
+- Đây là keymap tùy biến: giữ `Cmd+W/Shift+W` để chọn cú pháp và `Shift+F10/F9` để Run/Debug.
 - Không có `Shift Shift` (terminal không nhận được) và các phím `Ctrl` trùng với tmux hoặc Vim.
 - Trong profile này các phím trên không còn làm việc của iTerm: `Cmd+W` không đóng tab, `Cmd+D` không chia pane,
   `Cmd+F` không tìm trong iTerm. Ngoài Neovim chúng gửi `Alt+phím`, vd trong zsh `Cmd+B` lùi một từ.
@@ -159,8 +164,8 @@ terminal split. `JAVA_HOME` tự đặt đúng version trong `pom.xml`/`build.gr
 | Phím | Chức năng | Cần LSP |
 |---|---|---|
 | `Space j r` / `Space j R` | Chạy app (nhớ profile đã chọn) / chọn lại profile | |
-| `Space j D` | Chạy app ở chế độ debug (cổng 5005) | |
-| `Space j q` | Dừng app | |
+| `Space j D` | Chạy app debug, chờ JVM và tự attach (cổng 5005) | ✓ |
+| `Space j q` | Dừng app / debugger, hủy chờ attach | |
 | `Space j t` / `Space j n` | Test class hiện tại / method dưới con trỏ | |
 | `Space j T` | Test toàn bộ | |
 | `Space j m` | Lệnh Maven/Gradle: `dependency:tree`, `flyway:*`, `package`... | |
@@ -206,11 +211,14 @@ Khi LSP đang bật:
 ### Debug (nvim-dap)
 
 Java cần bật LSP và đợi jdtls import xong.
+`Shift+F9` / `Space j D` tự attach khi JVM báo JDWP sẵn sàng; chờ tối đa 60 giây.
+`Cmd+F2` / `Space j q` hủy bước chờ hoặc dừng phiên hiện tại. Nếu build lâu hơn timeout,
+xem log rồi attach thủ công bằng `Space d a`.
 
 | Phím | Chức năng |
 |---|---|
 | `Space d b` / `Space d B` | Breakpoint / có điều kiện |
-| `Space d a` | **Attach vào app** đang chạy từ `Space j D` |
+| `Space d a` | **Attach thủ công** vào JVM đang debug ở cổng 5005 |
 | `Space d c` hoặc `F9` | Bắt đầu / tiếp tục (chọn main class) |
 | `F8` / `F7` / `Shift-F8` | Step over / into / out (giống IntelliJ) · cũng có `Space d n/i/o` |
 | `Space d T` / `Space d N` | Debug test class / test method |
@@ -320,7 +328,7 @@ Danh sách **class / function / method** để nhảy nhanh trong file dài — 
   `Space ?` → xem phím tắt riêng của buffer hiện tại.
 - **lualine**: chỉ có chữ, không nền: mode · nhánh git · file · diagnostic · filetype · dòng:cột.
 - **bufferline**: tab các file đang mở, tab hiện tại chữ sáng, không viền. Ẩn khi chỉ có 1 file.
-- **autopairs**: tự đóng ngoặc/quote theo ngữ cảnh treesitter. `Alt-e` bọc nhanh phần còn lại của dòng vào ngoặc.
+- **autopairs**: tự đóng ngoặc/quote theo ngữ cảnh treesitter. `Alt-v` bọc nhanh phần còn lại của dòng vào ngoặc (nhường `Cmd+E` cho file gần đây).
 
 | Phím | Tab (file đang mở) |
 |---|---|
@@ -422,6 +430,8 @@ Cần Neovim ≥ 0.12 và Python 3. Chạy từ thư mục repo:
 python3 -m unittest discover -s tests -v
 ```
 
-Regression test kiểm tra Java/Spring, exit code của setup và luồng nâng cấp Tree-sitter CLI
-trên macOS/Linux. Test chạy offline với plugin, tmux và công cụ cài đặt được giả lập;
-file và config của bộ cài chỉ được tạo trong thư mục tạm.
+Regression test kiểm tra Java/Spring, shortcut theo mode, vùng chọn UTF-8/dòng/khối,
+lịch sử file đã đóng, route iTerm và luồng debug sẵn sàng/timeout/hủy. Có test output
+terminal thật ở cửa sổ hẹp, exit code của setup và nâng cấp Tree-sitter CLI trên macOS/Linux.
+Test chạy offline; plugin, tmux và công cụ cài đặt được giả lập. File/config của bộ cài
+chỉ được tạo trong thư mục tạm.

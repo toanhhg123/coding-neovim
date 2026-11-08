@@ -160,6 +160,36 @@ function cases.spring_terminal()
   equal({ 1, 2 }, stopped)
 end
 
+function cases.spring_debug_runner()
+  local spring = require("util.spring")
+  local p = project("debug-project")
+  write(p.root .. "/pom.xml", { "<project><java.version>21</java.version></project>" })
+  require("util.java")._jdks = { [21] = temp .. "/custom jdk" }
+  vim.env.TMUX = nil
+  vim.notify = function() end
+  local command, job_opts
+  vim.fn.jobstart = function(shell, opts) command, job_opts = shell[#shell], opts; return 1 end
+  spring._profiles[p.module] = false
+  select_project(p)
+  local started
+  spring.run_debug({ marker = "test-ready-marker", on_started = function(_, handle) started = handle end })
+  assert(command:find("printf '%s\\n' 'test-ready-marker' && JAVA_HOME=", 1, true), command)
+  assert(command:find("suspend=y,address=*:5005", 1, true), command)
+  assert(job_opts.on_stdout and started.kind == "term")
+  job_opts.on_stdout(1, { "partial", "out" })
+  job_opts.on_stdout(1, { "put", "" })
+  equal("partial\noutput\n", started.output)
+  -- Stop trong lúc menu profile mở phải chặn callback cũ chạy app về sau.
+  spring._profiles[p.module] = nil
+  local choose, allowed = nil, true
+  vim.ui.select = function(_, _, callback) choose = callback end
+  command = nil
+  spring.run_debug({ can_start = function() return allowed end })
+  allowed = false
+  choose("(không profile)")
+  equal(nil, command)
+end
+
 local ok, err = xpcall(assert(cases[case], "unknown case: " .. case), debug.traceback)
 vim.fn.delete(temp, "rf")
 if not ok then

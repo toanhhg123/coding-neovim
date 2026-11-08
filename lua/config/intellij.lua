@@ -3,11 +3,13 @@
 -- thành Alt+phím, tức <M-...> ở đây. Bảng đối chiếu đầy đủ nằm trong README.
 
 local map = vim.keymap.set
+local editor = require("util.intellij")
+editor.setup()
 
 local function esc_to_normal(fn)
   return function()
     vim.cmd.stopinsert()
-    fn()
+    vim.schedule(fn) -- stopinsert có hiệu lực khi callback hiện tại kết thúc
   end
 end
 
@@ -23,6 +25,9 @@ end
 local function keys(list, fn, desc, mode)
   for _, key in ipairs(list) do
     map(mode or "n", key, fn, { desc = desc })
+    if not mode then
+      map("i", key, type(fn) == "string" and ("<Esc>" .. fn) or esc_to_normal(fn), { desc = desc })
+    end
   end
 end
 
@@ -39,11 +44,12 @@ end
 -- ===== Điều hướng =====
 keys({ "<M-b>" }, lsp(function() require("telescope.builtin").lsp_definitions() end), "Cmd+B: nhảy tới định nghĩa")
 keys({ "<M-I>" }, lsp(function() require("telescope.builtin").lsp_implementations() end), "Cmd+Alt+B: implementations")
-keys({ "<M-u>" }, lsp(function() vim.lsp.buf.typehierarchy("supertypes") end), "Cmd+U: class cha / interface")
+keys({ "<M-u>" }, lsp(editor.super), "Cmd+U: method cha / class cha")
+keys({ "<M-B>" }, lsp(function() require("telescope.builtin").lsp_type_definitions() end), "Cmd+Shift+B: khai báo kiểu")
 keys({ "<M-F7>", "<F55>" }, lsp(function() require("telescope.builtin").lsp_references() end), "Alt+F7: tìm nơi dùng")
 keys({ "<F1>" }, lsp(vim.lsp.buf.hover), "F1: xem tài liệu")
 keys({ "<M-p>" }, lsp(vim.lsp.buf.signature_help), "Cmd+P: tham số của hàm")
-map("i", "<M-p>", vim.lsp.buf.signature_help, { desc = "Cmd+P: tham số của hàm" })
+map("i", "<M-p>", lsp(vim.lsp.buf.signature_help), { desc = "Cmd+P: tham số của hàm" })
 keys({ "<F2>" }, function() vim.diagnostic.jump({ count = 1, float = true }) end, "F2: lỗi kế tiếp")
 keys({ "<S-F2>", "<F14>" }, function() vim.diagnostic.jump({ count = -1, float = true }) end, "Shift+F2: lỗi trước")
 keys({ "<M-(>" }, "<C-o>", "Cmd+[: quay lại vị trí trước")
@@ -56,8 +62,12 @@ keys({ "<M-o>" }, function()
 end, "Cmd+O: tìm class")
 keys({ "<M-O>" }, telescope("find_files"), "Cmd+Shift+O: tìm file")
 keys({ "<M-Y>" }, lsp(function() require("telescope.builtin").lsp_dynamic_workspace_symbols() end), "Cmd+Alt+O: tìm symbol")
-keys({ "<M-e>" }, telescope("buffers", { sort_mru = true, ignore_current_buffer = true }), "Cmd+E: file gần đây")
-keys({ "<M-f>" }, telescope("current_buffer_fuzzy_find"), "Cmd+F: tìm trong file")
+keys({ "<M-e>" }, editor.recent_picker, "Cmd+E: file gần đây (cả file đã đóng)")
+keys({ "<M-f>" }, "/", "Cmd+F: tìm trong file (regex Vim)")
+keys({ "<M-g>" }, function() editor.search_next(false) end, "Cmd+G: kết quả tìm tiếp")
+keys({ "<M-G>" }, function() editor.search_next(true) end, "Cmd+Shift+G: kết quả tìm trước")
+keys({ "<M-A>" }, telescope("commands"), "Cmd+Shift+A: tìm lệnh / hành động")
+keys({ "<M-l>" }, editor.go_to_line, "Cmd+L: tới dòng/cột")
 keys({ "<M-F>" }, telescope("live_grep"), "Cmd+Shift+F: tìm trong project")
 keys({ "<M-r>" }, function()
   require("grug-far").open({ prefills = { paths = vim.fn.expand("%") } })
@@ -80,11 +90,12 @@ map("i", "<M-z>", "<cmd>undo<CR>", { desc = "Cmd+Z: hoàn tác" })
 keys({ "<M-Z>" }, "<C-r>", "Cmd+Shift+Z: làm lại")
 map("i", "<M-Z>", "<cmd>redo<CR>", { desc = "Cmd+Shift+Z: làm lại" })
 keys({ "<M-a>" }, "ggVG", "Cmd+A: chọn tất cả")
+map("x", "<M-a>", "<Esc>ggVG", { desc = "Cmd+A: chọn tất cả" })
 map("n", "<M-/>", "gcc", { remap = true, desc = "Cmd+/: comment dòng" })
 map("x", "<M-/>", "gc", { remap = true, desc = "Cmd+/: comment vùng chọn" })
 map("i", "<M-/>", "<Esc>gcca", { remap = true, desc = "Cmd+/: comment dòng" })
 map("n", "<M-d>", "<cmd>t.<CR>", { desc = "Cmd+D: nhân đôi dòng" })
-map("x", "<M-d>", ":t'><CR>gv", { silent = true, desc = "Cmd+D: nhân đôi vùng chọn" })
+map("x", "<M-d>", editor.duplicate_selection, { desc = "Cmd+D: nhân đôi vùng chọn" })
 map("i", "<M-d>", "<cmd>t.<CR>", { desc = "Cmd+D: nhân đôi dòng" })
 map("n", "<M-x>", '"_dd', { desc = "Cmd+Backspace: xoá dòng" })
 map("x", "<M-x>", '"_d', { desc = "Cmd+Backspace: xoá vùng chọn" })
@@ -93,15 +104,18 @@ map("n", "<M-J>", "<cmd>move .+1<CR>==", { desc = "Alt+Shift+Down: chuyển dòn
 map("n", "<M-K>", "<cmd>move .-2<CR>==", { desc = "Alt+Shift+Up: chuyển dòng lên" })
 map("x", "<M-J>", ":move '>+1<CR>gv=gv", { silent = true, desc = "Alt+Shift+Down: chuyển dòng xuống" })
 map("x", "<M-K>", ":move '<-2<CR>gv=gv", { silent = true, desc = "Alt+Shift+Up: chuyển dòng lên" })
+map("i", "<M-J>", "<Esc><cmd>move .+1<CR>==gi", { desc = "Alt+Shift+Down: chuyển dòng xuống" })
+map("i", "<M-K>", "<Esc><cmd>move .-2<CR>==gi", { desc = "Alt+Shift+Up: chuyển dòng lên" })
 -- Cmd+W: chọn rộng dần theo cú pháp (an/in có sẵn của Neovim 0.12)
 map("n", "<M-w>", "van", { remap = true, desc = "Cmd+W: chọn theo cú pháp" })
 map("x", "<M-w>", "an", { remap = true, desc = "Cmd+W: chọn rộng hơn" })
 map("x", "<M-W>", "in", { remap = true, desc = "Cmd+Shift+W: chọn hẹp lại" })
+map("i", "<M-w>", "<Esc>van", { remap = true, desc = "Cmd+W: chọn theo cú pháp" })
 
 -- ===== Refactor & sinh code =====
 keys({ "<M-CR>" }, lsp(vim.lsp.buf.code_action), "Alt+Enter: sửa nhanh")
-map("x", "<M-CR>", vim.lsp.buf.code_action, { desc = "Alt+Enter: sửa nhanh" })
-map("i", "<M-CR>", esc_to_normal(vim.lsp.buf.code_action), { desc = "Alt+Enter: sửa nhanh" })
+map("x", "<M-CR>", lsp(vim.lsp.buf.code_action), { desc = "Alt+Enter: sửa nhanh" })
+map("i", "<M-CR>", esc_to_normal(lsp(vim.lsp.buf.code_action)), { desc = "Alt+Enter: sửa nhanh" })
 keys({ "<S-F6>", "<F18>" }, lsp(vim.lsp.buf.rename), "Shift+F6: đổi tên")
 keys({ "<M-L>" }, lsp(function() vim.lsp.buf.format({ async = true }) end), "Cmd+Alt+L: format")
 keys({ "<M-n>" }, lsp(function()
@@ -114,8 +128,8 @@ end), "Ctrl+Alt+O: sắp xếp import")
 
 -- ===== Chạy, test, debug =====
 keys({ "<S-F10>", "<F22>" }, spring("run"), "Shift+F10: chạy app")
-keys({ "<S-F9>", "<F21>" }, spring("run_debug"), "Shift+F9: chạy app chế độ debug")
-keys({ "<M-q>" }, spring("stop"), "Cmd+F2: dừng app")
+keys({ "<S-F9>", "<F21>" }, function() require("util.debug").start() end, "Shift+F9: chạy app và attach debugger")
+keys({ "<M-q>" }, function() require("util.debug").stop() end, "Cmd+F2: dừng app / debugger")
 keys({ "<M-t>" }, spring("test_class"), "Cmd+Shift+F10: chạy test class")
 keys({ "<M-T>" }, spring("toggle_test"), "Cmd+Shift+T: nhảy class <-> test")
 keys({ "<M-8>" }, function() require("dap").toggle_breakpoint() end, "Cmd+F8: breakpoint")

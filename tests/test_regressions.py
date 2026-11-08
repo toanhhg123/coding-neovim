@@ -27,9 +27,21 @@ class NeovimTests(unittest.TestCase):
             subprocess.run(["bash", "-n", script], cwd=REPO, check=True)
 
     def test_java_and_spring(self):
-        for case in ("java_home", "java_special_files", "java_autocmd", "spring_tmux", "spring_terminal"):
+        for case in ("java_home", "java_special_files", "java_autocmd", "spring_tmux", "spring_terminal", "spring_debug_runner"):
             with self.subTest(case=case):
                 result = self.run_case("lua_cases.lua", case)
+                self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_intellij_shortcuts(self):
+        for case in ("modes", "duplicate", "recent", "search_and_line", "lsp_and_actions", "workflow_shortcuts", "profile"):
+            with self.subTest(case=case):
+                result = self.run_case("intellij_cases.lua", case)
+                self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_debug_workflow(self):
+        for case in ("ready_tmux", "ready_term", "timeout", "cancel_wait", "cancel_profile", "stop_dap", "guards", "narrow_terminal"):
+            with self.subTest(case=case):
+                result = self.run_case("debug_cases.lua", case)
                 self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_setup_success(self):

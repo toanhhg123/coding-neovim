@@ -8,7 +8,7 @@ return {
     opts = {
       check_ts = true,          -- dùng treesitter để đóng ngoặc thông minh theo ngữ cảnh
       disable_filetype = { "TelescopePrompt", "grug-far" },
-      fast_wrap = {},           -- Alt-e: bọc nhanh phần còn lại của dòng vào ngoặc
+      fast_wrap = { map = "<M-v>" }, -- Alt-v: không trùng Cmd+E (iTerm gửi <M-e>)
     },
   },
 }

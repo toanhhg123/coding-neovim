@@ -17,8 +17,8 @@ return {
     keys = {
       { "<leader>jr", spring("run"), desc = "Chạy app (nhớ profile đã chọn)" },
       { "<leader>jR", spring("run_pick_profile"), desc = "Chạy app: chọn profile" },
-      { "<leader>jD", spring("run_debug"), desc = "Chạy app chế độ debug (cổng 5005)" },
-      { "<leader>jq", spring("stop"), desc = "Dừng app" },
+      { "<leader>jD", function() require("util.debug").start() end, desc = "Chạy app và attach debugger (cổng 5005)" },
+      { "<leader>jq", function() require("util.debug").stop() end, desc = "Dừng app / debugger" },
       { "<leader>jt", spring("test_class"), desc = "Test: class hiện tại" },
       { "<leader>jn", spring("test_method"), desc = "Test: method dưới con trỏ" },
       { "<leader>jT", spring("test_all"), desc = "Test: toàn bộ" },

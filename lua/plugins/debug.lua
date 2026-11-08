@@ -18,17 +18,7 @@ end
 
 --- Attach vào app đang chạy ở chế độ debug (<leader>jD).
 local function attach()
-  local d = require("dap")
-  if #vim.lsp.get_clients({ name = "jdtls" }) == 0 then
-    return vim.notify("Attach Java cần LSP: bật bằng <leader>cl rồi đợi jdtls import xong", vim.log.levels.WARN, { title = "Debug" })
-  end
-  d.run({
-    type = "java",
-    request = "attach",
-    name = "Attach Spring Boot",
-    hostName = "127.0.0.1",
-    port = require("util.spring").debug_port,
-  })
+  require("util.debug").attach()
 end
 
 return {
@@ -57,7 +47,7 @@ return {
       { "<leader>do", dap("step_out"), desc = "Step out" },
       { "<leader>dl", dap("run_last"), desc = "Chạy lại lần debug trước" },
       { "<leader>dr", dap("repl_toggle"), desc = "REPL" },
-      { "<leader>dq", dap("terminate"), desc = "Dừng debug" },
+      { "<leader>dq", function() require("util.debug").stop() end, desc = "Dừng debug / app" },
       { "<leader>du", function() require("dapui").toggle() end, desc = "Bật/tắt giao diện debug" },
       { "<leader>de", function() require("dapui").eval() end, mode = { "n", "x" }, desc = "Xem giá trị biểu thức" },
       -- Cùng phím với IntelliJ
