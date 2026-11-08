@@ -3,16 +3,7 @@
 -- Cần: tree-sitter-cli (>= 0.26.1, cài qua package manager, KHÔNG qua npm) + C compiler.
 -- Plugin này không hỗ trợ lazy-load; highlight do Neovim chạy, nên startup vẫn nhẹ.
 
-local parsers = {
-  "lua", "vim", "vimdoc", "bash", "regex",
-  -- JS/TS + Frontend
-  "javascript", "typescript", "tsx", "html", "css", "scss",
-  "json", "yaml", "toml",
-  -- Java / Spring Boot
-  "java", "xml", "properties", "sql",
-  -- Hạ tầng & tài liệu
-  "dockerfile", "gitignore", "gitcommit", "diff", "markdown", "markdown_inline",
-}
+local parsers = require("util.parsers")
 
 -- Bật highlight + indent cho buffer nếu có parser; thiếu parser thì tự cài (nếu được hỗ trợ).
 local function attach(buf, lang)

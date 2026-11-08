@@ -332,7 +332,7 @@ Danh sách **class / function / method** để nhảy nhanh trong file dài — 
 
 ## Yêu cầu (dependencies)
 
-Sẽ được bổ sung dần khi build. Dự kiến:
+`install.sh` cài sẵn các công cụ này, trừ Nerd Font và `psql`; `lazydocker` chỉ cài trên macOS:
 
 | Tool | Mục đích | Cài |
 |---|---|---|
@@ -354,19 +354,40 @@ Sẽ được bổ sung dần khi build. Dự kiến:
 
 ## Cài đặt
 
-> Sẽ hoàn thiện sau khi có Bước 1.
+Một lệnh, cho macOS (cần [Homebrew](https://brew.sh)) hoặc Debian/Ubuntu:
 
 ```bash
-# Backup config cũ (nếu có)
-mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null || true
-
-# Clone & symlink
-git clone <repo-url> ~/develop/coding-neovim
-ln -s ~/develop/coding-neovim ~/.config/nvim
-
-# Mở nvim, lazy.nvim sẽ tự cài plugin
-nvim
+curl -fsSL https://raw.githubusercontent.com/toanhhg123/coding-neovim/main/install.sh | bash
 ```
+
+Script [install.sh](install.sh) làm lần lượt:
+
+1. Cài công cụ: Neovim ≥ 0.12, tree-sitter-cli, ripgrep, fd, fzf, tmux, Node ≥ 22, jq, git, JDK 21 và 25.
+   macOS dùng Homebrew. Ubuntu dùng apt, còn Neovim, tree-sitter, Node, JDK 25 tải bản chính thức vào `~/.local`.
+2. Clone repo vào `~/develop/coding-neovim` (đã có thì `git pull`).
+3. Tạo symlink `~/.config/nvim`, `~/.config/tmux/tmux.conf`, `~/.config/tmux/scripts`.
+   Config cũ ở các chỗ đó được đổi tên thành `*.bak-<thời gian>`, không bị xoá.
+4. Cài plugin tmux, plugin Neovim (đúng version trong `lazy-lock.json`), parser treesitter, LSP qua Mason.
+5. macOS có iTerm: thêm profile `coding-neovim` cho phím `Cmd` kiểu IntelliJ.
+
+Chạy lại bao nhiêu lần cũng được, bước nào đã xong thì bỏ qua. Lần đầu mất khoảng 5–10 phút.
+
+Tuỳ chọn (đặt trước `bash`, vd `curl ... | SKIP_JAVA=1 bash`):
+
+| Biến | Tác dụng |
+|---|---|
+| `CODING_NVIM_DIR=~/code/nvim` | Đổi thư mục clone |
+| `SKIP_DEPS=1` | Không cài công cụ hệ thống, tự cài trước |
+| `SKIP_JAVA=1` | Không cài JDK |
+
+Muốn đọc script trước khi chạy:
+
+```bash
+git clone https://github.com/toanhhg123/coding-neovim.git ~/develop/coding-neovim
+~/develop/coding-neovim/install.sh
+```
+
+Distro Linux khác: script vẫn liên kết config và cài plugin, nhưng bạn tự cài công cụ ở bước 1.
 
 ---
 

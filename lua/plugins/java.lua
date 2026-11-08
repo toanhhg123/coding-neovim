@@ -3,7 +3,7 @@
 -- spring-boot.nvim: gợi ý application.yml/properties, tra bean/endpoint qua LSP
 -- Lệnh chạy app/test không cần LSP nằm trong lua/util/spring.lua (<leader>j).
 
-local TOOLS = { "jdtls", "java-debug-adapter", "java-test", "vscode-spring-boot-tools" }
+local TOOLS = require("util.java").TOOLS
 
 local function spring(fn)
   return function() require("util.spring")[fn]() end

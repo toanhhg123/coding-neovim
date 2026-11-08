@@ -3,6 +3,9 @@
 
 local M = {}
 
+--- Package Mason cho Java/Spring (dùng chung với install.sh qua scripts/setup.lua)
+M.TOOLS = { "jdtls", "java-debug-adapter", "java-test", "vscode-spring-boot-tools" }
+
 local exe = vim.fn.has("win32") == 1 and "java.exe" or "java"
 
 local function java_bin(home)
@@ -19,8 +22,19 @@ end
 function M.jdks()
   if M._jdks then return M._jdks end
   local found = {}
+  -- Version đọc từ file `release` của JDK, không có thì đoán từ tên thư mục
+  local function major_of(home, name)
+    local file = vim.fs.joinpath(home, "release")
+    if vim.fn.filereadable(file) == 1 then
+      for _, line in ipairs(vim.fn.readfile(file, "", 20)) do
+        local version = line:match('^JAVA_VERSION="([^"]+)"')
+        if version then return major_from_name(version) end
+      end
+    end
+    return major_from_name(name)
+  end
   local function add(home, name)
-    local major = major_from_name(name or vim.fs.basename(home))
+    local major = major_of(home, name)
     if major and not found[major] and vim.fn.executable(java_bin(home)) == 1 then
       found[major] = home
     end
@@ -28,13 +42,17 @@ function M.jdks()
   local patterns = {
     vim.fs.normalize("~/.sdkman/candidates/java") .. "/*",
     "/Library/Java/JavaVirtualMachines/*/Contents/Home",
+    "/opt/homebrew/opt/openjdk*/libexec/openjdk.jdk/Contents/Home",
+    "/usr/local/opt/openjdk*/libexec/openjdk.jdk/Contents/Home",
     "/usr/lib/jvm/*",
+    vim.fs.normalize("~/.local/share/jdks") .. "/*", -- install.sh cài JDK vào đây trên Linux
     "C:/Program Files/Java/*",
     "C:/Program Files/Eclipse Adoptium/*",
   }
   for _, pattern in ipairs(patterns) do
     for _, home in ipairs(vim.fn.glob(pattern, true, true)) do
-      local name = home:match("Contents/Home$") and vim.fs.basename(vim.fs.dirname(vim.fs.dirname(home)))
+      local name = home:match("libexec/openjdk.jdk/Contents/Home$") and vim.fs.basename(home:gsub("/libexec/.*$", ""))
+        or home:match("Contents/Home$") and vim.fs.basename(vim.fs.dirname(vim.fs.dirname(home)))
         or vim.fs.basename(home)
       if name ~= "current" then add(home, name) end
     end
@@ -43,10 +61,11 @@ function M.jdks()
   return found
 end
 
---- Java để CHẠY jdtls: bản mới nhất >= 25 (jdtls 1.63 không khởi động được trên Java 21).
---- Project vẫn biên dịch đúng version của nó qua M.runtimes().
+--- Java để CHẠY jdtls: ưu tiên 25 (jdtls 1.63 không khởi động được trên Java 21),
+--- không có thì bản mới nhất >= 25. Project vẫn biên dịch đúng version của nó qua M.runtimes().
 function M.jdtls_java()
   local jdks = M.jdks()
+  if jdks[25] then return java_bin(jdks[25]) end
   local newest = 0
   for major in pairs(jdks) do
     newest = math.max(newest, major)
