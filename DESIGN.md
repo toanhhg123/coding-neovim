@@ -116,11 +116,11 @@ Công cụ nặng (LSP, debug) chỉ nạp khi cần, nên Neovim vẫn là mộ
 | `<leader>e` | **Explorer** | `e` toggle file tree |
 | `<leader>b` | **Buffer** | chuyển/đóng buffer |
 | `g` `[` `]` | **Navigation** | `gd` def, `gr` refs, `]c`/`[c` hunk, `]d`/`[d` diagnostic |
-| `Cmd+...` | **IntelliJ** | `lua/config/intellij.lua`, cần profile `iterm/coding-neovim.json` |
+| `Cmd+...` | **IntelliJ (tùy chọn)** | Không nạp mặc định; bật từ `config/local.lua` và profile `iterm/coding-neovim.json` |
 | `Ctrl-h/j/k/l` | **tmux/split** | nhảy giữa pane & split |
 
-> Tham chiếu keymap kiểu IntelliJ (search everywhere, find-in-files, go-to-definition)
-> sẽ được map tương ứng và ghi rõ trong README.
+> Mặc định dùng phím gốc Vim và namespace Space, không cần profile bàn phím terminal.
+> Bộ Cmd là tùy chọn; `Ctrl-f` giữ cho Vim cuộn trang, sessionizer dùng tmux prefix + f.
 
 ---
 

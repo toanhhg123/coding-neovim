@@ -1,9 +1,9 @@
--- lua/config/intellij.lua — phím tắt theo IntelliJ IDEA (macOS)
+-- Bộ phím IntelliJ tùy chọn: require("config.intellij") trong config/local.lua.
 -- Terminal không truyền được Cmd, nên profile iTerm (iterm/coding-neovim.json) đổi Cmd+phím
 -- thành Alt+phím, tức <M-...> ở đây. Bảng đối chiếu đầy đủ nằm trong README.
 
 local map = vim.keymap.set
-local editor = require("util.intellij")
+local editor = require("util.editor")
 editor.setup()
 
 local function esc_to_normal(fn)
@@ -56,10 +56,7 @@ keys({ "<M-(>" }, "<C-o>", "Cmd+[: quay lại vị trí trước")
 keys({ "<M-)>" }, "<C-i>", "Cmd+]: tới vị trí sau")
 
 -- ===== Tìm kiếm =====
-keys({ "<M-o>" }, function()
-  if #vim.lsp.get_clients({ bufnr = 0 }) == 0 then return require("telescope.builtin").find_files() end
-  require("telescope.builtin").lsp_dynamic_workspace_symbols({ symbols = { "class", "interface", "enum", "struct" } })
-end, "Cmd+O: tìm class")
+keys({ "<M-o>" }, editor.class_picker, "Cmd+O: tìm class")
 keys({ "<M-O>" }, telescope("find_files"), "Cmd+Shift+O: tìm file")
 keys({ "<M-Y>" }, lsp(function() require("telescope.builtin").lsp_dynamic_workspace_symbols() end), "Cmd+Alt+O: tìm symbol")
 keys({ "<M-e>" }, editor.recent_picker, "Cmd+E: file gần đây (cả file đã đóng)")

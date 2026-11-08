@@ -5,7 +5,8 @@
 -- 1) Options + keymaps + autocmds cơ bản (không phụ thuộc plugin)
 require("config.options")
 require("config.keymaps")
-require("config.intellij")
+-- Mặc định dùng phím Vim/Space, không cần profile bàn phím của terminal.
+-- Bộ Cmd tùy chọn: require("config.intellij") trong lua/config/local.lua.
 require("config.autocmds")
 vim.cmd.colorscheme("iterm") -- colors/iterm.lua, cần có trước khi plugin UI nạp
 

@@ -34,7 +34,7 @@ Prefix mặc định: **`Ctrl-t`**.
 | Phím | Chức năng |
 |---|---|
 | `Ctrl-h/j/k/l` | Nhảy liền mạch giữa **Neovim split ↔ tmux pane** |
-| `Ctrl-f` hoặc `prefix f` | **Sessionizer**: fzf chọn project → tạo/switch session (BE/FE/job) |
+| `prefix f` | **Sessionizer**: fzf chọn project → tạo/switch session (BE/FE/job) |
 | `prefix s` | Danh sách session đang có |
 | `prefix \|` / `prefix -` | Split dọc / ngang (mở ở đúng thư mục hiện tại) |
 | `prefix h/j/k/l` | Resize pane · `prefix m` zoom pane |
@@ -45,13 +45,62 @@ Prefix mặc định: **`Ctrl-t`**.
   (đổi bằng biến `TMUX_SESSIONIZER_PATHS`). Cần `fzf` (+ `fd` nếu có).
 - Đã bật `focus-events` (Neovim autoread trong tmux) + true color.
 
-### Phím tắt IntelliJ
+### Phím tắt Vim (mặc định)
 
-Dùng `Cmd` như IntelliJ trên macOS, song song với nhóm phím `Space` (không phím `Space` nào bị bỏ).
-Terminal không truyền được `Cmd`, nên cần profile iTerm trong repo: nó đổi `Cmd+phím` thành `Alt+phím`
-để đi qua tmux tới Neovim. Khai báo phím ở [lua/config/intellij.lua](lua/config/intellij.lua).
+Dùng được với profile **Default** của iTerm và các terminal khác, không cần chuyển phím `Cmd`.
+Nhấn `Esc` để về Normal mode rồi bấm lần lượt, ví dụ `Space` → `f` → `f` để tìm file.
+`Space` là leader; chữ hoa cần giữ `Shift`. Bấm `Space` rồi chờ để xem which-key.
 
-Cài đặt: chép profile rồi chọn `coding-neovim` trong iTerm (Settings → Profiles → Other Actions → Set as Default).
+**Quên phím?** Nhấn `Esc` → `Space ?` để mở bảng tra nhanh, rồi gõ tên việc muốn làm:
+`debug`, `test`, `import`, `format`, `doi ten` (tìm tiếng Việt không dấu cũng được).
+`Ctrl-j/k` hoặc mũi tên để chọn, `Enter` chạy hành động, `Esc` đóng bảng và quay lại code.
+Bảng chỉ hiển thị phím Normal mode đang có hiệu lực trong file hiện tại, có cả phím Java/LSP
+sau khi server attach. Có thể mở bằng `Space f k`, `:Keymaps` hoặc lọc sẵn với `:Keymaps test`.
+Muốn xem gợi ý theo nhóm thì bấm `Space` rồi chờ; `Space f ?` xem các phím riêng của buffer.
+
+| Phím | Chức năng |
+|---|---|
+| `Space ?` / `Space f k` | Tra nhanh keymap theo tên hành động |
+| `Space f f` / `Space Space` | Tìm file |
+| `Space f t` | Tìm class/type (chưa có LSP thì tìm file) |
+| `Space f o` | File gần đây, kể cả file vừa đóng |
+| `Space f g` | Tìm nội dung toàn project |
+| `Space f s` / `Space f S` | Symbol trong file / toàn project |
+| `Space f c` | Tìm lệnh / hành động |
+| `Space f l` / `25G` | Tới dòng:cột / tới dòng 25 |
+| `/từ_khóa` rồi `Enter`, `n` / `N` | Tìm trong file, kết quả tiếp / trước |
+| `gd` / `gr` / `gi` / `gy` | Định nghĩa / nơi dùng / implementation / khai báo kiểu |
+| `gS` | Method cha trong Java / class cha ở ngôn ngữ khác |
+| `K` / `Space c p` | Tài liệu / thông tin tham số |
+| `Ctrl-o` / `Ctrl-i` | Quay lại / đi tiếp vị trí |
+| `Space w` / `u` / `Ctrl-r` | Lưu / undo / redo |
+| `gcc` / chọn vùng rồi `gc` | Comment dòng / vùng chọn |
+| `yyp` / chọn vùng rồi `Space c y` | Nhân đôi dòng / đúng vùng chọn |
+| `ggVG` / `van` | Chọn tất cả / chọn theo cú pháp; Visual dùng `an`/`in` để rộng/thu lại |
+| `Space r n` / `Space c a` | Đổi tên / sửa nhanh |
+| `Space c f` / `Space c g` | Format / sinh code |
+| `Space j o` / `Space j a` | Sắp xếp import / nhảy class ↔ test |
+| `Space j r` / `Space j R` / `Space j q` | Chạy app / chọn profile / dừng app hoặc debug |
+| `Space j t` / `Space j n` / `Space j T` | Test class / method / toàn bộ |
+| `Space j D` / `Space d b` | Chạy debug và tự attach / breakpoint |
+| `Space d c` / `Space d n` / `Space d i` / `Space d o` | Tiếp tục / step over / into / out |
+| `Space d e` / `Space d q` | Xem biểu thức / dừng debug |
+| `Space e` / `Space b d` / `Shift-h/l` | Cây file / đóng buffer / buffer trước-sau |
+| `Ctrl-f` / `Ctrl-b` | Cuộn một trang xuống / lên (tmux không chiếm `Ctrl-f`) |
+
+### Phím tắt IntelliJ (tùy chọn)
+
+Bộ này **không nạp mặc định**. Chỉ bật nếu muốn dùng lại các phím `Cmd`: thêm vào
+`lua/config/local.lua` (file riêng từng máy, không commit):
+
+```lua
+require("config.intellij")
+```
+
+Cần thêm profile iTerm trong repo để đổi `Cmd+phím` thành chuỗi Neovim nhận được.
+Nếu dùng profile Default, iTerm vẫn xử lý các phím Cmd của nó; hãy dùng bộ phím Vim ở trên.
+
+Cài đặt tùy chọn: chép profile rồi chọn `coding-neovim` cho tab iTerm dùng bộ phím Cmd.
 
 ```bash
 cp iterm/coding-neovim.json ~/Library/Application\ Support/iTerm2/DynamicProfiles/
@@ -211,8 +260,8 @@ Khi LSP đang bật:
 ### Debug (nvim-dap)
 
 Java cần bật LSP và đợi jdtls import xong.
-`Shift+F9` / `Space j D` tự attach khi JVM báo JDWP sẵn sàng; chờ tối đa 60 giây.
-`Cmd+F2` / `Space j q` hủy bước chờ hoặc dừng phiên hiện tại. Nếu build lâu hơn timeout,
+`Space j D` tự attach khi JVM báo JDWP sẵn sàng; chờ tối đa 60 giây.
+`Space j q` hủy bước chờ hoặc dừng phiên hiện tại. Nếu build lâu hơn timeout,
 xem log rồi attach thủ công bằng `Space d a`.
 
 | Phím | Chức năng |
@@ -291,7 +340,7 @@ Trong diffview: `Tab`/`Shift-Tab` chuyển file, `]c`/`[c` nhảy hunk, `q` đ�
 | `<space>fo` | File mở gần đây |
 | `<space>fb` | Danh sách buffer |
 | `<space>fr` | Mở lại kết quả tìm trước |
-| `<space>fk` | Tra cứu phím tắt |
+| `<space>?` / `<space>fk` | Tra keymap theo tên hành động (Normal mode) |
 
 Trong ô tìm: `Ctrl-j/k` di chuyển, `Ctrl-q` gửi kết quả ra quickfix, `Esc` đóng.
 
@@ -325,10 +374,10 @@ Danh sách **class / function / method** để nhảy nhanh trong file dài — 
 - **Colorscheme**: `colors/iterm.lua`, lấy từ bảng màu profile iTerm, nền trong suốt. Đổi profile thì sửa bảng `c`
   đầu file. Terminal khác iTerm vẫn dùng được, chỉ là màu theo bảng này.
 - **which-key**: bấm `Space` rồi chờ ~0.3s → hiện bảng gợi ý phím theo nhóm (Find/Git/Java...).
-  `Space ?` → xem phím tắt riêng của buffer hiện tại.
+  `Space ?` → bảng tra keymap có tìm kiếm; `Space f ?` → phím tắt riêng của buffer hiện tại.
 - **lualine**: chỉ có chữ, không nền: mode · nhánh git · file · diagnostic · filetype · dòng:cột.
 - **bufferline**: tab các file đang mở, tab hiện tại chữ sáng, không viền. Ẩn khi chỉ có 1 file.
-- **autopairs**: tự đóng ngoặc/quote theo ngữ cảnh treesitter. `Alt-v` bọc nhanh phần còn lại của dòng vào ngoặc (nhường `Cmd+E` cho file gần đây).
+- **autopairs**: tự đóng ngoặc/quote theo ngữ cảnh treesitter. Trong Insert, `Ctrl-g` rồi `w` để bọc nhanh phần còn lại của dòng vào ngoặc.
 
 | Phím | Tab (file đang mở) |
 |---|---|
@@ -379,7 +428,7 @@ Script [install.sh](install.sh) làm lần lượt:
 3. Tạo symlink `~/.config/nvim`, `~/.config/tmux/tmux.conf`, `~/.config/tmux/scripts`.
    Config cũ ở các chỗ đó được đổi tên thành `*.bak-<thời gian>`, không bị xoá.
 4. Cài plugin tmux, plugin Neovim (đúng version trong `lazy-lock.json`), parser treesitter, LSP qua Mason.
-5. macOS có iTerm: thêm profile `coding-neovim` cho phím `Cmd` kiểu IntelliJ.
+5. Chỉ khi đặt `INSTALL_ITERM_PROFILE=1`: thêm profile iTerm `coding-neovim` cho bộ phím Cmd tùy chọn.
 
 Chạy lại bao nhiêu lần cũng được, bước nào đã xong thì bỏ qua. Lần đầu mất khoảng 5–10 phút.
 
@@ -390,6 +439,7 @@ Tuỳ chọn (đặt trước `bash`, vd `curl ... | SKIP_JAVA=1 bash`):
 | `CODING_NVIM_DIR=~/code/nvim` | Đổi thư mục clone |
 | `SKIP_DEPS=1` | Không cài công cụ hệ thống, tự cài trước |
 | `SKIP_JAVA=1` | Không cài JDK |
+| `INSTALL_ITERM_PROFILE=1` | Cài profile iTerm cho bộ phím Cmd tùy chọn; mặc định không cài |
 
 Muốn đọc script trước khi chạy:
 
@@ -417,7 +467,7 @@ Distro Linux khác: script vẫn liên kết config và cài plugin, nhưng bạ
 | `<leader>d` | Debug |
 | `<leader>D` | Database |
 | `<leader>h` | HTTP (curl) |
-| `Cmd+...` | Phím theo IntelliJ, xem mục [Phím tắt IntelliJ](#phím-tắt-intellij) |
+| `Cmd+...` | Bộ phím IntelliJ tùy chọn, xem mục [Phím tắt IntelliJ](#phím-tắt-intellij-tùy-chọn) |
 | `Ctrl-h/j/k/l` | Nhảy giữa split & tmux pane |
 
 `leader` = `Space`.
@@ -430,8 +480,11 @@ Cần Neovim ≥ 0.12 và Python 3. Chạy từ thư mục repo:
 python3 -m unittest discover -s tests -v
 ```
 
-Regression test kiểm tra Java/Spring, shortcut theo mode, vùng chọn UTF-8/dòng/khối,
-lịch sử file đã đóng, route iTerm và luồng debug sẵn sàng/timeout/hủy. Có test output
-terminal thật ở cửa sổ hẹp, exit code của setup và nâng cấp Tree-sitter CLI trên macOS/Linux.
-Test chạy offline; plugin, tmux và công cụ cài đặt được giả lập. File/config của bộ cài
+Regression test kiểm tra startup mặc định không nạp Cmd, xung đột leader, shortcut theo mode,
+vùng chọn UTF-8/dòng/khối, lịch sử file đã đóng và bộ IntelliJ tùy chọn. Có test output
+terminal thật ở cửa sổ hẹp, debug sẵn sàng/timeout/hủy, exit code của setup và nâng cấp
+Tree-sitter CLI trên macOS/Linux. Test chạy offline với LSP/DAP và công cụ cài đặt giả lập.
+Nếu có tmux, test dùng server riêng để kiểm tra `Ctrl-f` và sessionizer; file/config bộ cài
 chỉ được tạo trong thư mục tạm.
+Test bảng tra keymap kiểm tra nhóm phím, tìm không dấu, ưu tiên buffer-local và các lệnh mở bảng;
+nếu Telescope/plenary đã cài, có thêm test bấm Enter trong picker thật để chạy đúng hành động.

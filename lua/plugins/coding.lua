@@ -8,7 +8,7 @@ return {
     opts = {
       check_ts = true,          -- dùng treesitter để đóng ngoặc thông minh theo ngữ cảnh
       disable_filetype = { "TelescopePrompt", "grug-far" },
-      fast_wrap = { map = "<M-v>" }, -- Alt-v: không trùng Cmd+E (iTerm gửi <M-e>)
+      fast_wrap = { map = "<C-g>w" }, -- Insert: Ctrl-g rồi w, không cần terminal gửi Alt/Cmd
     },
   },
 }

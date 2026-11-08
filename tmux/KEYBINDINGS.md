@@ -23,12 +23,13 @@ Tham chiếu đầy đủ phím tắt tmux của cấu hình này (`tmux/tmux.co
 
 | Phím | Chức năng |
 |---|---|
-| `Ctrl-f` **(no prefix)** | **Sessionizer**: fzf chọn project → tạo/switch session |
-| `⟨p⟩ f` | Sessionizer (như trên, qua prefix) |
+| `⟨p⟩ f` | **Sessionizer**: fzf chọn project → tạo/switch session |
 | `⟨p⟩ s` | Danh sách **session** đang có → chọn để switch |
 | `⟨p⟩ $` | Đổi tên session hiện tại |
 | `⟨p⟩ d` | Detach (thoát khỏi tmux, session vẫn chạy nền) |
 | `⟨p⟩ (` / `⟨p⟩ )` | Session trước / sau |
+
+`Ctrl-f` được chuyển xuống Vim để cuộn trang; không còn mở sessionizer.
 
 ## 🪟 Window (tab)
 

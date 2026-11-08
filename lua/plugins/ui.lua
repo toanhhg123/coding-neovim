@@ -37,7 +37,7 @@ return {
     },
     keys = {
       {
-        "<leader>?",
+        "<leader>f?",
         function()
           require("which-key").show({ global = false })
         end,

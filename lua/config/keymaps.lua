@@ -3,6 +3,8 @@
 -- leader = Space (đã set trong options.lua)
 
 local map = vim.keymap.set
+local editor = require("util.editor")
+editor.setup() -- ghi lịch sử cả file vừa đóng, kể cả khi không bật bộ phím Cmd
 
 -- === Cơ bản ===
 -- Bỏ highlight tìm kiếm
@@ -10,6 +12,8 @@ map("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Xoá highlight tìm kiếm" }
 
 -- Lưu file nhanh
 map("n", "<leader>w", "<cmd>write<CR>", { desc = "Lưu file" })
+map("n", "<leader>cy", "<cmd>t.<CR>", { desc = "Nhân đôi dòng" })
+map("x", "<leader>cy", editor.duplicate_selection, { desc = "Nhân đôi vùng chọn" })
 
 -- === Di chuyển giữa split & tmux pane ===
 -- Ctrl-h/j/k/l do vim-tmux-navigator đảm nhận (xem lua/plugins/tmux.lua)

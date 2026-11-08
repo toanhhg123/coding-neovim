@@ -26,12 +26,12 @@ local function cancel()
 end
 
 function M.attach(project)
-  if M.pending then return notify("Đang chờ JVM debug; dùng Cmd+F2 để hủy") end
+  if M.pending then return notify("Đang chờ JVM debug; dùng Space j q để hủy") end
   project = project or require("util.spring").project()
   local client = java_client(project)
   if not client then return notify("Cần jdtls của project hiện tại: bật LSP rồi đợi import xong") end
   local dap = require("dap")
-  if dap.session() then return notify("Đang có phiên debug; dừng trước bằng Cmd+F2") end
+  if dap.session() then return notify("Đang có phiên debug; dừng trước bằng Space j q") end
   if not dap.adapters.java then require("jdtls").setup_dap({ hotcodereplace = "auto" }) end
   if not dap.adapters.java then return notify("Chưa có Java debug adapter") end
   dap.run({
@@ -99,7 +99,7 @@ function M.start()
   local project = spring.project()
   if not java_client(project) then return notify("Debug cần jdtls của project hiện tại; bật LSP rồi đợi import xong") end
   local dap = require("dap")
-  if M.pending or dap.session() then return notify("Đang có phiên debug hoặc đang chờ JVM; dừng trước bằng Cmd+F2") end
+  if M.pending or dap.session() then return notify("Đang có phiên debug hoặc đang chờ JVM; dừng trước bằng Space j q") end
   if not dap.adapters.java then require("jdtls").setup_dap({ hotcodereplace = "auto" }) end
   if not dap.adapters.java then return notify("Chưa có Java debug adapter") end
   local pending = { project = project, marker = "coding-nvim-debug-" .. tostring(vim.uv.hrtime()) }

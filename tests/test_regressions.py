@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import uuid
 
 REPO = Path(__file__).resolve().parents[1]
 NVIM = shutil.which("nvim")
@@ -37,6 +38,26 @@ class NeovimTests(unittest.TestCase):
             with self.subTest(case=case):
                 result = self.run_case("intellij_cases.lua", case)
                 self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_vim_defaults(self):
+        for case in ("startup", "editing", "navigation", "recent", "lsp", "workflow", "optional_cmd", "conflicts"):
+            with self.subTest(case=case):
+                result = self.run_case("vim_cases.lua", case)
+                self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_keymap_help(self):
+        for case in ("entries", "buffer_override", "entry_points"):
+            with self.subTest(case=case):
+                result = self.run_case("keymaps_cases.lua", case)
+                self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_keymap_picker_integration(self):
+        data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share"))
+        plugin_dir = data / os.environ.get("NVIM_APPNAME", "nvim") / "lazy"
+        if not all((plugin_dir / name).is_dir() for name in ("telescope.nvim", "plenary.nvim")):
+            self.skipTest("Telescope/plenary are not installed; unit cases still run offline")
+        result = self.run_case("keymaps_cases.lua", "picker")
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_debug_workflow(self):
         for case in ("ready_tmux", "ready_term", "timeout", "cancel_wait", "cancel_profile", "stop_dap", "guards", "narrow_terminal"):
@@ -98,7 +119,7 @@ elif tool == "curl":
 
 
 class InstallerTests(unittest.TestCase):
-    def run_installer(self, platform, version, skip_deps=False):
+    def run_installer(self, platform, version, skip_deps=False, install_profile=False):
         with tempfile.TemporaryDirectory(prefix="coding-neovim-test-") as temp:
             temp = Path(temp)
             bin_dir, home, repo = temp / "bin", temp / "home", temp / "repo"
@@ -119,11 +140,21 @@ class InstallerTests(unittest.TestCase):
                 (bin_dir / tool).symlink_to(executable)
             env = dict(os.environ, HOME=str(home), TMPDIR=str(temp), PATH=str(bin_dir), CODING_NVIM_DIR=str(repo),
                        TEST_PLATFORM=platform, TEST_VERSION_FILE=str(version_file), TEST_LOG=str(log),
-                       SKIP_JAVA="1", SKIP_DEPS="1" if skip_deps else "0")
+                       SKIP_JAVA="1", SKIP_DEPS="1" if skip_deps else "0",
+                       INSTALL_ITERM_PROFILE="1" if install_profile else "0")
             result = subprocess.run([str(bin_dir / "bash"), str(REPO / "install.sh")],
                                     env=env, capture_output=True, text=True, timeout=20)
             calls = [json.loads(line) for line in log.read_text().splitlines()]
+            profile = home / "Library/Application Support/iTerm2/DynamicProfiles/coding-neovim.json"
+            if not install_profile:
+                self.assertFalse(profile.exists(), "default install must not install a Cmd keyboard profile")
+            elif platform == "Darwin" and Path("/Applications/iTerm.app").is_dir():
+                self.assertEqual((REPO / "iterm/coding-neovim.json").read_bytes(), profile.read_bytes())
             return result, calls
+
+    def test_iterm_profile_is_opt_in(self):
+        result, _ = self.run_installer("Darwin", "0.26.1", install_profile=True)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_old_tree_sitter_is_upgraded(self):
         for platform in ("Darwin", "Linux"):
@@ -150,6 +181,29 @@ class InstallerTests(unittest.TestCase):
                 self.assertNotEqual(0, result.returncode, result.stdout + result.stderr)
                 self.assertIn("tree-sitter-cli >= 0.26.1", result.stderr)
                 self.assertFalse(any(call[0] == "git" for call in calls))
+
+
+class TmuxTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which("tmux"), "tmux is not installed")
+    def test_ctrl_f_returns_to_vim(self):
+        with tempfile.TemporaryDirectory(prefix="coding-neovim-tmux-") as temp:
+            temp = Path(temp)
+            tpm = temp / ".config/tmux/plugins/tpm/tpm"
+            tpm.parent.mkdir(parents=True)
+            tpm.write_text("#!/bin/sh\nexit 0\n")
+            tpm.chmod(0o755)
+            env = dict(os.environ, HOME=str(temp), TMUX="")
+            command = [shutil.which("tmux"), "-L", "cnv-test-" + uuid.uuid4().hex[:12]]
+            def run(*args, check=True):
+                return subprocess.run(command + list(args), env=env, capture_output=True, text=True, timeout=10, check=check)
+            try:
+                run("-f", "/dev/null", "new-session", "-d", "-s", "test", "sleep 30")
+                run("bind-key", "-n", "C-f", "display-message", "old sessionizer shortcut")
+                run("source-file", str(REPO / "tmux/tmux.conf"))
+                self.assertNotEqual(0, run("list-keys", "-T", "root", "C-f", check=False).returncode)
+                self.assertIn("tmux-sessionizer", run("list-keys", "-T", "prefix", "f").stdout)
+            finally:
+                run("kill-server", check=False)
 
 
 if __name__ == "__main__":

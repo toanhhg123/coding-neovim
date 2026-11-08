@@ -9,6 +9,7 @@
 #   CODING_NVIM_REPO  địa chỉ git của repo
 #   SKIP_DEPS=1       không cài công cụ hệ thống (Neovim, ripgrep, Node...)
 #   SKIP_JAVA=1       không cài JDK
+#   INSTALL_ITERM_PROFILE=1  cài profile Cmd tùy chọn (mặc định dùng phím Vim)
 
 set -euo pipefail
 
@@ -16,6 +17,7 @@ REPO_URL="${CODING_NVIM_REPO:-https://github.com/toanhhg123/coding-neovim.git}"
 DIR="${CODING_NVIM_DIR:-$HOME/develop/coding-neovim}"
 SKIP_DEPS="${SKIP_DEPS:-0}"
 SKIP_JAVA="${SKIP_JAVA:-0}"
+INSTALL_ITERM_PROFILE="${INSTALL_ITERM_PROFILE:-0}"
 NVIM_MIN="0.12.0"
 TREE_SITTER_MIN="0.26.1"
 NODE_MIN=22
@@ -238,15 +240,15 @@ nvim --headless -c "luafile $DIR/scripts/setup.lua" </dev/null
 ok "Đã cài parser và LSP"
 
 # ============================================================
-# 6. Profile iTerm (phím Cmd kiểu IntelliJ)
+# 6. Profile iTerm tùy chọn (phím Vim mặc định không cần bước này)
 # ============================================================
-if [ "$PLATFORM" = mac ] && [ -d "/Applications/iTerm.app" ]; then
+if [ "$INSTALL_ITERM_PROFILE" = 1 ] && [ "$PLATFORM" = mac ] && [ -d "/Applications/iTerm.app" ]; then
   info "Profile iTerm"
   PROFILES="$HOME/Library/Application Support/iTerm2/DynamicProfiles"
   mkdir -p "$PROFILES"
   cp "$DIR/iterm/coding-neovim.json" "$PROFILES/"
   ok "Đã thêm profile coding-neovim"
-  NOTES+=("iTerm: Settings → Profiles → chọn coding-neovim → Other Actions → Set as Default")
+  NOTES+=("Bộ phím Cmd tùy chọn: require(\"config.intellij\") trong lua/config/local.lua và chọn profile iTerm coding-neovim")
 fi
 
 info "Xong"

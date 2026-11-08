@@ -186,8 +186,8 @@ function cases.profile()
     end
   end
   local wrap = profile.Profiles[1]["Keyboard Map"]["0x76-0x80000"]
-  equal({ Action = 11, Text = "0x1b 0x76" }, wrap)
-  equal("<M-v>", require("plugins.coding")[1].opts.fast_wrap.map)
+  equal({ Action = 11, Text = "0x07 0x77" }, wrap)
+  equal("<C-g>w", require("plugins.coding")[1].opts.fast_wrap.map)
 end
 
 local ok, err = xpcall(assert(cases[arg[1]], "unknown case"), debug.traceback)

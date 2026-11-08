@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # tmux-sessionizer — nhảy nhanh giữa các project/session (BE / FE / job)
 # Chọn 1 thư mục project bằng fzf -> tạo (hoặc switch) tmux session cùng tên.
-# Bind: prefix + f  hoặc  Ctrl-f  (xem tmux.conf)
+# Bind: prefix + f (giữ Ctrl-f cho Vim, xem tmux.conf)
 
 # Các thư mục gốc chứa project. Sửa danh sách này cho hợp máy bạn.
 # Có thể override bằng biến môi trường: TMUX_SESSIONIZER_PATHS="~/a ~/b"

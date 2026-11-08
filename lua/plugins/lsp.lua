@@ -83,6 +83,7 @@ return {
           map("gi", ok and tb.lsp_implementations or vim.lsp.buf.implementation, "Implementations")
           map("gy", ok and tb.lsp_type_definitions or vim.lsp.buf.type_definition, "Type definition")
           map("gD", vim.lsp.buf.declaration, "Khai báo")
+          map("gS", function() require("util.editor").super() end, "Method cha (Java) / class cha")
           -- Luồng gọi & kế thừa (đọc code Spring: ai gọi service này, class nào implement)
           map("<leader>ci", ok and tb.lsp_incoming_calls or vim.lsp.buf.incoming_calls, "Ai gọi hàm này")
           map("<leader>cI", ok and tb.lsp_outgoing_calls or vim.lsp.buf.outgoing_calls, "Hàm này gọi những gì")
@@ -90,10 +91,14 @@ return {
           map("<leader>cH", function() vim.lsp.buf.typehierarchy("supertypes") end, "Class cha / interface")
           -- Đọc thông tin
           map("K", vim.lsp.buf.hover, "Hover (xem doc/type)")
+          map("<leader>cp", vim.lsp.buf.signature_help, "Thông tin tham số")
           -- Sửa nhanh
           map("<leader>rn", vim.lsp.buf.rename, "Đổi tên (rename)")
           map("<leader>ca", vim.lsp.buf.code_action, "Code action")
           map("<leader>cf", function() vim.lsp.buf.format({ async = true }) end, "Format (thủ công)")
+          map("<leader>cg", function()
+            vim.lsp.buf.code_action({ context = { only = { "source" }, diagnostics = {} } })
+          end, "Sinh code (getter, constructor...)")
           -- Diagnostics
           map("gl", vim.diagnostic.open_float, "Xem diagnostic dòng này")
           map("]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, "Diagnostic kế tiếp")

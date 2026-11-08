@@ -5,7 +5,7 @@
 return {
   {
     "nvim-telescope/telescope.nvim",
-    cmd = "Telescope",
+    cmd = { "Telescope", "Keymaps" },
     dependencies = {
       "nvim-lua/plenary.nvim",
       {
@@ -20,7 +20,9 @@ return {
       { "<leader>ff", "<cmd>Telescope find_files<CR>", desc = "Tìm file" },
       { "<leader><leader>", "<cmd>Telescope find_files<CR>", desc = "Tìm file (nhanh)" },
       { "<leader>fF", "<cmd>Telescope find_files hidden=true no_ignore=true<CR>", desc = "Tìm file (kể cả ẩn/ignore)" },
-      { "<leader>fo", "<cmd>Telescope oldfiles<CR>", desc = "File gần đây" },
+      { "<leader>fo", function() require("util.editor").recent_picker() end, desc = "File gần đây (cả file đã đóng)" },
+      { "<leader>ft", function() require("util.editor").class_picker() end, desc = "Tìm class / type (fallback tìm file)" },
+      { "<leader>fl", function() require("util.editor").go_to_line() end, desc = "Tới dòng/cột" },
 
       -- --- Tìm từ khoá (grep) ---
       { "<leader>fg", "<cmd>Telescope live_grep<CR>", desc = "Grep từ khoá (toàn project)" },
@@ -34,9 +36,11 @@ return {
 
       -- --- Trợ giúp & khám phá ---
       { "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "Trợ giúp (help)" },
-      { "<leader>fk", "<cmd>Telescope keymaps<CR>", desc = "Danh sách phím tắt" },
+      { "<leader>?", function() require("util.keymaps").show() end, desc = "Tra keymap nhanh (gõ để tìm)" },
+      { "<leader>fk", function() require("util.keymaps").show() end, desc = "Tra keymap theo hành động" },
       { "<leader>fc", "<cmd>Telescope commands<CR>", desc = "Danh sách lệnh" },
       { "<leader>fs", "<cmd>Telescope lsp_document_symbols<CR>", desc = "Symbol trong file (cần LSP)" },
+      { "<leader>fS", "<cmd>Telescope lsp_dynamic_workspace_symbols<CR>", desc = "Symbol toàn project (cần LSP)" },
     },
     opts = function()
       local actions = require("telescope.actions")
@@ -101,6 +105,7 @@ return {
       local telescope = require("telescope")
       telescope.setup(opts)
       telescope.load_extension("fzf")
+      require("util.keymaps").setup()
     end,
   },
 }
