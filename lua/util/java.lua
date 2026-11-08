@@ -39,6 +39,11 @@ function M.jdks()
       found[major] = home
     end
   end
+  -- Ưu tiên lựa chọn tường minh của người dùng nếu trùng major với JDK tự dò.
+  if vim.env.JAVA_HOME and vim.env.JAVA_HOME ~= "" then
+    local home = vim.fs.normalize(vim.env.JAVA_HOME)
+    add(home, vim.fs.basename(home))
+  end
   local patterns = {
     vim.fs.normalize("~/.sdkman/candidates/java") .. "/*",
     "/Library/Java/JavaVirtualMachines/*/Contents/Home",
@@ -159,9 +164,11 @@ local function uses_lombok(path)
   return false
 end
 
---- Nội dung khởi đầu của một file .java trống.
+--- Nội dung khởi đầu của một file .java trống; nil nếu cần người dùng tự viết.
 function M.skeleton(path)
   local name = vim.fn.fnamemodify(path, ":t:r")
+  -- Hai descriptor này không khai báo class; module name không suy ra được từ tên file.
+  if name == "package-info" or name == "module-info" then return nil end
   local package = path:match("/src/[^/]+/java/(.+)/[^/]+$")
   local kind, annotations, imports = "public class", {}, {}
 

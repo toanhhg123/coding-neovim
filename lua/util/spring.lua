@@ -8,8 +8,8 @@ local M = {}
 
 M.debug_port = 5005
 
-M._panes = {}      -- { app = "%12", task = "%13" }
-M._terms = {}      -- ngoài tmux: { app = { buf, job } }
+M._panes = {}      -- [module] = { app = "%12", task = "%13" }
+M._terms = {}      -- ngoài tmux: [module] = { app = { buf, job } }
 M._profiles = {}   -- profile đã chọn theo từng project
 
 -- ===== Xác định project =====
@@ -71,6 +71,11 @@ end
 
 -- ===== Chạy lệnh trong tmux pane / terminal =====
 
+-- Module riêng có thể chạy app riêng dù dùng chung wrapper ở project.root.
+local function project_key(project)
+  return vim.uv.fs_realpath(project.module) or vim.fs.normalize(project.module)
+end
+
 local function tmux(args)
   local result = vim.system(vim.list_extend({ "tmux" }, args), { text = true }):wait()
   return result.code == 0, vim.trim(result.stdout or "")
@@ -82,12 +87,15 @@ local function pane_alive(id)
   return ok and vim.tbl_contains(vim.split(panes, "\n"), id)
 end
 
-local function run_in_tmux(kind, root, cmd)
-  local id = M._panes[kind]
+local function run_in_tmux(kind, project, cmd)
+  local key, root = project_key(project), project.root
+  local panes = M._panes[key] or {}
+  M._panes[key] = panes
+  local id = panes[kind]
   if pane_alive(id) then
     tmux({ "send-keys", "-t", id, "C-c" })
   else
-    local other = M._panes[kind == "app" and "task" or "app"]
+    local other = panes[kind == "app" and "task" or "app"]
     local args = pane_alive(other)
         and { "split-window", "-h", "-d", "-t", other, "-c", root, "-P", "-F", "#{pane_id}" }
       or { "split-window", "-v", "-d", "-l", "30%", "-t", vim.env.TMUX_PANE, "-c", root, "-P", "-F", "#{pane_id}" }
@@ -97,14 +105,17 @@ local function run_in_tmux(kind, root, cmd)
       vim.notify("Không mở được tmux pane: " .. id, vim.log.levels.ERROR, { title = "Spring" })
       return
     end
-    M._panes[kind] = id
+    panes[kind] = id
   end
   tmux({ "send-keys", "-t", id, "-l", "cd " .. vim.fn.shellescape(root) .. " && " .. cmd })
   tmux({ "send-keys", "-t", id, "Enter" })
 end
 
-local function run_in_term(kind, root, cmd)
-  local term = M._terms[kind]
+local function run_in_term(kind, project, cmd)
+  local key = project_key(project)
+  local terms = M._terms[key] or {}
+  M._terms[key] = terms
+  local term = terms[kind]
   if term and vim.api.nvim_buf_is_valid(term.buf) then
     pcall(vim.fn.jobstop, term.job)
     pcall(vim.api.nvim_buf_delete, term.buf, { force = true })
@@ -113,8 +124,8 @@ local function run_in_term(kind, root, cmd)
   vim.cmd("botright 15new")
   local buf = vim.api.nvim_get_current_buf()
   local shell = vim.fn.has("win32") == 1 and { "cmd", "/c", cmd } or { vim.o.shell, "-c", cmd }
-  local job = vim.fn.jobstart(shell, { term = true, cwd = root })
-  M._terms[kind] = { buf = buf, job = job }
+  local job = vim.fn.jobstart(shell, { term = true, cwd = project.root })
+  terms[kind] = { buf = buf, job = job }
   vim.api.nvim_set_current_win(current)
 end
 
@@ -122,21 +133,25 @@ end
 function M.exec(kind, project, cmd)
   local full = with_jdk(project, cmd)
   if vim.env.TMUX then
-    run_in_tmux(kind, project.root, full)
+    run_in_tmux(kind, project, full)
   else
-    run_in_term(kind, project.root, full)
+    run_in_term(kind, project, full)
   end
   -- redraw + cắt ngắn: sau menu chọn hoặc thông báo dài, Neovim sẽ hiện "Press ENTER" và nuốt phím kế tiếp
   vim.cmd.redraw()
   vim.notify(vim.fn.strcharpart(cmd, 0, vim.o.columns - 20), vim.log.levels.INFO, { title = "Spring" })
 end
 
---- Dừng app đang chạy.
+--- Dừng app của module hiện tại.
 function M.stop()
-  if vim.env.TMUX and pane_alive(M._panes.app) then
-    tmux({ "send-keys", "-t", M._panes.app, "C-c" })
-  elseif M._terms.app then
-    pcall(vim.fn.jobstop, M._terms.app.job)
+  local project = require_project()
+  if not project then return end
+  local key = project_key(project)
+  local panes, terms = M._panes[key] or {}, M._terms[key] or {}
+  if vim.env.TMUX and pane_alive(panes.app) then
+    tmux({ "send-keys", "-t", panes.app, "C-c" })
+  elseif terms.app then
+    pcall(vim.fn.jobstop, terms.app.job)
   else
     vim.notify("Chưa có app nào đang chạy", vim.log.levels.INFO, { title = "Spring" })
   end

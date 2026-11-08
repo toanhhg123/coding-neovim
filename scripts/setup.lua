@@ -13,22 +13,27 @@ local function step(name, fn)
 end
 
 step("Parser treesitter", function()
-  require("nvim-treesitter").install(require("util.parsers")):wait(15 * 60 * 1000)
+  local installed = require("nvim-treesitter").install(require("util.parsers")):wait(15 * 60 * 1000)
+  assert(installed, "không cài đủ parser treesitter")
 end)
 
 step("Package Mason (LSP, Java, Spring)", function()
   -- Nạp lspconfig để có danh sách server mà config đang dùng
   require("lazy").load({ plugins = { "nvim-lspconfig" } })
+  local registry = require("mason-registry")
+  local refreshed, refresh_ok = false, false
+  registry.refresh(function(success)
+    refreshed, refresh_ok = true, success
+  end)
+  assert(vim.wait(120000, function() return refreshed end, 200), "hết thời gian chờ Mason registry")
+  assert(refresh_ok, "không cập nhật được Mason registry")
+
+  -- Máy mới chỉ có mapping server -> package sau khi registry refresh xong.
   local to_package = require("mason-lspconfig").get_mappings().lspconfig_to_package
   local names = vim.deepcopy(require("util.java").TOOLS)
   for _, server in ipairs(require("util.lsp").servers) do
     if to_package[server] then table.insert(names, to_package[server]) end
   end
-
-  local registry = require("mason-registry")
-  local refreshed = false
-  registry.refresh(function() refreshed = true end)
-  vim.wait(120000, function() return refreshed end, 200)
 
   local pending = 0
   for _, name in ipairs(names) do

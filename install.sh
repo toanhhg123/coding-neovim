@@ -17,6 +17,7 @@ DIR="${CODING_NVIM_DIR:-$HOME/develop/coding-neovim}"
 SKIP_DEPS="${SKIP_DEPS:-0}"
 SKIP_JAVA="${SKIP_JAVA:-0}"
 NVIM_MIN="0.12.0"
+TREE_SITTER_MIN="0.26.1"
 NODE_MIN=22
 STAMP="$(date +%Y%m%d-%H%M%S)"
 LOCAL_BIN="$HOME/.local/bin"
@@ -47,6 +48,13 @@ ver_ge() {
 
 nvim_ok() { have nvim && ver_ge "$(nvim --version | head -1 | sed -E 's/^NVIM v([0-9.]+).*/\1/')" "$NVIM_MIN"; }
 node_ok() { have node && (($(node -p 'process.versions.node.split(".")[0]') >= NODE_MIN)); }
+tree_sitter_ok() {
+  have tree-sitter || return 1
+  local version
+  version="$(tree-sitter --version 2>/dev/null)" || return 1
+  version="$(printf '%s\n' "$version" | sed -nE 's/^tree-sitter ([0-9]+\.[0-9]+\.[0-9]+).*/\1/p')"
+  [ -n "$version" ] && ver_ge "$version" "$TREE_SITTER_MIN"
+}
 
 # Toàn bộ nằm trong main: khi chạy kiểu "curl | bash", bash đọc hết script trước khi chạy,
 # nên lệnh con có đọc stdin cũng không nuốt mất phần còn lại.
@@ -80,6 +88,7 @@ install_mac() {
     brew install "${missing[@]}"
   fi
   nvim_ok || brew upgrade neovim
+  tree_sitter_ok || brew upgrade tree-sitter-cli
   node_ok || brew upgrade node
   ok "Homebrew: ${pkgs[*]}"
 }
@@ -111,13 +120,14 @@ install_linux() {
     ln -sf "$LOCAL_OPT/$name/bin/nvim" "$LOCAL_BIN/nvim"
   fi
 
-  if ! have tree-sitter; then
+  if ! tree_sitter_ok; then
     local zip
     zip="$(mktemp)"
     download "https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-cli-linux-$ARCH.zip" >"$zip"
     unzip -o -q "$zip" tree-sitter -d "$LOCAL_BIN"
     chmod +x "$LOCAL_BIN/tree-sitter"
     rm -f "$zip"
+    hash -r # bỏ cache executable cũ trong PATH sau khi cài vào ~/.local/bin
   fi
 
   if ! node_ok; then
@@ -158,7 +168,7 @@ else
 fi
 nvim_ok || die "Cần Neovim >= $NVIM_MIN"
 have git || die "Cần git"
-have tree-sitter || warn "Thiếu tree-sitter-cli: parser treesitter sẽ không cài được"
+tree_sitter_ok || die "Cần tree-sitter-cli >= $TREE_SITTER_MIN (kiểm tra tree-sitter --version và PATH)"
 node_ok || warn "Node < $NODE_MIN hoặc chưa cài: một số LSP (TypeScript, YAML) sẽ không chạy"
 
 # ============================================================

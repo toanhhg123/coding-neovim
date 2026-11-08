@@ -191,6 +191,9 @@ Controller và Service có thêm `@RequiredArgsConstructor` nếu project dùng 
  Tạo bằng neo-tree (`a`, file mở luôn) hay `:e` đều được, không cần LSP.
 Nội dung chưa lưu, `:w` để lưu.
 
+`package-info.java` và `module-info.java` được giữ trống để tự viết descriptor.
+App/test chạy riêng theo từng module; lệnh dừng app chỉ tác động đến module của file hiện tại.
+
 Khi LSP đang bật:
 - **jdtls** chạy bằng JDK mới nhất có trên máy (**jdtls 1.63 cần Java 25**, không khởi động được
   trên Java 21); project vẫn biên dịch đúng version của nó. JDK được tự dò từ sdkman, JVM hệ thống.
@@ -410,3 +413,15 @@ Distro Linux khác: script vẫn liên kết config và cài plugin, nhưng bạ
 | `Ctrl-h/j/k/l` | Nhảy giữa split & tmux pane |
 
 `leader` = `Space`.
+
+## Kiểm tra thay đổi
+
+Cần Neovim ≥ 0.12 và Python 3. Chạy từ thư mục repo:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+Regression test kiểm tra Java/Spring, exit code của setup và luồng nâng cấp Tree-sitter CLI
+trên macOS/Linux. Test chạy offline với plugin, tmux và công cụ cài đặt được giả lập;
+file và config của bộ cài chỉ được tạo trong thư mục tạm.

@@ -70,6 +70,7 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufReadPost" }, {
     local path = vim.api.nvim_buf_get_name(buf)
     if path:match("^%a+://") then return end -- source thư viện qua jdt://
     local body = require("util.java").skeleton(path)
+    if not body then return end
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, body)
     if vim.api.nvim_get_current_buf() == buf then
       vim.api.nvim_win_set_cursor(0, { #body - 1, 0 }) -- con trỏ ở thân class
