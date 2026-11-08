@@ -52,10 +52,14 @@ Nhấn `Esc` để về Normal mode rồi bấm lần lượt, ví dụ `Space` 
 `Space` là leader; chữ hoa cần giữ `Shift`. Bấm `Space` rồi chờ để xem which-key.
 
 **Quên phím?** Nhấn `Esc` → `Space ?` để mở bảng tra nhanh, rồi gõ tên việc muốn làm:
-`debug`, `test`, `import`, `format`, `doi ten` (tìm tiếng Việt không dấu cũng được).
-`Ctrl-j/k` hoặc mũi tên để chọn, `Enter` chạy hành động, `Esc` đóng bảng và quay lại code.
-Bảng chỉ hiển thị phím Normal mode đang có hiệu lực trong file hiện tại, có cả phím Java/LSP
-sau khi server attach. Có thể mở bằng `Space f k`, `:Keymaps` hoặc lọc sẵn với `:Keymaps test`.
+`split`, `chia man hinh`, `chuyen o`, `dong o`, `visual`, `debug`, `test`, `import`, `doi ten`.
+`Ctrl-j/k` hoặc mũi tên để chọn, `Esc` đóng bảng và quay lại code.
+Bảng ghép hơn 200 lệnh Vim gốc thường dùng với toàn bộ mapping hiện tại, kể cả mapping thiếu
+mô tả và các mode Normal, Insert, Visual, Select, Operator, Command, Terminal, Language.
+Mapping riêng của buffer được ưu tiên; các phím Java/LSP xuất hiện sau khi server attach.
+`Enter` chạy phím Normal hoàn chỉnh trong ô gốc. Dòng có nhãn **hướng dẫn** (mode khác hoặc
+lệnh cần thêm tham số) chỉ nhắc cách dùng, không phát nhầm phím vào Normal.
+Mở bằng `Space f k`, `:Keymaps` hoặc lọc sẵn: `:Keymaps split`, `:Keymaps visual`, `:Keymaps test`.
 Muốn xem gợi ý theo nhóm thì bấm `Space` rồi chờ; `Space f ?` xem các phím riêng của buffer.
 
 | Phím | Chức năng |
@@ -86,7 +90,15 @@ Muốn xem gợi ý theo nhóm thì bấm `Space` rồi chờ; `Space f ?` xem c
 | `Space d c` / `Space d n` / `Space d i` / `Space d o` | Tiếp tục / step over / into / out |
 | `Space d e` / `Space d q` | Xem biểu thức / dừng debug |
 | `Space e` / `Space b d` / `Shift-h/l` | Cây file / đóng buffer / buffer trước-sau |
+| `Ctrl-w` rồi `v` / `s` | Chia ô dọc / ngang |
+| `Ctrl-w` rồi `h/j/k/l` | Chuyển sang ô trái / dưới / trên / phải |
+| `Ctrl-w` rồi `q` / `c` | Đóng ô; `q` thoát nếu là ô cuối, `c` cần ít nhất 2 ô |
+| `Ctrl-w` rồi `=` | Chia đều kích thước các ô |
+| `Ctrl-w` rồi `+/-` / `>/<` | Tăng/giảm chiều cao / chiều rộng ô |
 | `Ctrl-f` / `Ctrl-b` | Cuộn một trang xuống / lên (tmux không chiếm `Ctrl-f`) |
+
+`Ctrl-w` rồi `v`: giữ Ctrl bấm w, thả Ctrl rồi bấm v. Các phím này có trong bảng tra với
+từ khóa `split`, `window`, `resize`, `chuyen o` hoặc `dong o`.
 
 ### Phím tắt IntelliJ (tùy chọn)
 
@@ -340,7 +352,7 @@ Trong diffview: `Tab`/`Shift-Tab` chuyển file, `]c`/`[c` nhảy hunk, `q` đ�
 | `<space>fo` | File mở gần đây |
 | `<space>fb` | Danh sách buffer |
 | `<space>fr` | Mở lại kết quả tìm trước |
-| `<space>?` / `<space>fk` | Tra keymap theo tên hành động (Normal mode) |
+| `<space>?` / `<space>fk` | Tra lệnh Vim gốc và mapping mọi mode theo tên hành động |
 
 Trong ô tìm: `Ctrl-j/k` di chuyển, `Ctrl-q` gửi kết quả ra quickfix, `Esc` đóng.
 
@@ -486,5 +498,6 @@ terminal thật ở cửa sổ hẹp, debug sẵn sàng/timeout/hủy, exit code
 Tree-sitter CLI trên macOS/Linux. Test chạy offline với LSP/DAP và công cụ cài đặt giả lập.
 Nếu có tmux, test dùng server riêng để kiểm tra `Ctrl-f` và sessionizer; file/config bộ cài
 chỉ được tạo trong thư mục tạm.
-Test bảng tra keymap kiểm tra nhóm phím, tìm không dấu, ưu tiên buffer-local và các lệnh mở bảng;
-nếu Telescope/plenary đã cài, có thêm test bấm Enter trong picker thật để chạy đúng hành động.
+Test bảng tra keymap kiểm tra lệnh gốc, nhóm phím, tìm không dấu, đủ mode, override buffer-local
+kể cả thiếu mô tả, chia/chuyển/resize/đóng ô và hướng dẫn đúng ngữ cảnh. Nếu Telescope/plenary
+đã cài, có thêm test picker thật chạy mapping buffer-local, chia ô và chỉ hướng dẫn phím Visual.

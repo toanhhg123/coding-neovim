@@ -46,7 +46,7 @@ class NeovimTests(unittest.TestCase):
                 self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_keymap_help(self):
-        for case in ("entries", "buffer_override", "entry_points"):
+        for case in ("entries", "reference", "buffer_override", "modes", "windows", "stale_origin", "entry_points"):
             with self.subTest(case=case):
                 result = self.run_case("keymaps_cases.lua", case)
                 self.assertEqual(0, result.returncode, result.stdout + result.stderr)
@@ -56,8 +56,10 @@ class NeovimTests(unittest.TestCase):
         plugin_dir = data / os.environ.get("NVIM_APPNAME", "nvim") / "lazy"
         if not all((plugin_dir / name).is_dir() for name in ("telescope.nvim", "plenary.nvim")):
             self.skipTest("Telescope/plenary are not installed; unit cases still run offline")
-        result = self.run_case("keymaps_cases.lua", "picker")
-        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        for case in ("picker", "picker_split", "picker_guide"):
+            with self.subTest(case=case):
+                result = self.run_case("keymaps_cases.lua", case)
+                self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_debug_workflow(self):
         for case in ("ready_tmux", "ready_term", "timeout", "cancel_wait", "cancel_profile", "stop_dap", "guards", "narrow_terminal"):
