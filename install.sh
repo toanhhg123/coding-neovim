@@ -79,7 +79,7 @@ esac
 install_mac() {
   have brew || die "Cần Homebrew trước: https://brew.sh"
   xcode-select -p >/dev/null 2>&1 || warn "Chưa có Xcode Command Line Tools (cần để build plugin): xcode-select --install"
-  local pkgs=(git neovim tree-sitter-cli ripgrep fd fzf tmux node jq lazydocker)
+  local pkgs=(git neovim tree-sitter-cli ripgrep fd fzf tmux node jq lazydocker pngpaste)
   [ "$SKIP_JAVA" = 1 ] || pkgs+=(openjdk@25 openjdk@21)
   local missing=()
   local p
@@ -106,7 +106,7 @@ install_linux() {
   local sudo=""
   [ "$(id -u)" = 0 ] || sudo="sudo"
   $sudo apt-get update -qq
-  $sudo apt-get install -y -qq git curl unzip tar xz-utils build-essential ripgrep fd-find fzf tmux jq >/dev/null
+  $sudo apt-get install -y -qq git curl unzip tar xz-utils build-essential ripgrep fd-find fzf tmux jq xclip wl-clipboard >/dev/null
   if [ "$SKIP_JAVA" != 1 ]; then
     $sudo apt-get install -y -qq openjdk-21-jdk >/dev/null || warn "apt không có openjdk-21-jdk"
   fi

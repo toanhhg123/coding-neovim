@@ -190,6 +190,22 @@ function cases.spring_debug_runner()
   equal(nil, command)
 end
 
+function cases.markdown_image()
+  local spec
+  for _, plugin in ipairs(dofile(vim.fn.getcwd() .. "/lua/plugins/markdown.lua")) do
+    if plugin[1] == "HakonHarnes/img-clip.nvim" then spec = plugin end
+  end
+  assert(spec, "img-clip chưa được khai báo")
+  -- Nạp cùng file markdown để kéo-thả ảnh hoạt động, không chỉ khi bấm phím
+  equal({ "markdown" }, spec.ft)
+  local key = spec.keys[1]
+  equal({ "<leader>mi", "<cmd>PasteImage<CR>", "markdown" }, { key[1], key[2], key.ft })
+  local opts = spec.opts.default
+  equal("assets", opts.dir_path)
+  equal(true, opts.relative_to_current_file)
+  equal(true, opts.copy_images)
+end
+
 local ok, err = xpcall(assert(cases[case], "unknown case: " .. case), debug.traceback)
 vim.fn.delete(temp, "rf")
 if not ok then

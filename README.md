@@ -311,6 +311,13 @@ LSP tắt thì vẫn gợi ý từ path, snippet và buffer. File SQL có gợi 
 |---|---|
 | `Space m r` | Render markdown **trong editor** (bật/tắt) — heading, bảng, code, checkbox |
 | `Space m p` | Preview trên **trình duyệt** (live, cuộn đồng bộ) |
+| `Space m i` | **Dán ảnh** đang có trong clipboard |
+
+**Chèn ảnh:** copy ảnh (vd chụp màn hình bằng `Cmd+Ctrl+Shift+4`), rồi trong file `.md` bấm `Space m i`. Hoặc
+kéo file ảnh từ Finder/trình duyệt thả vào terminal (đang ở normal mode). Ô nhập điền sẵn `assets/`: gõ tiếp tên
+rồi `Enter`, hoặc `Enter` luôn để đặt tên theo thời gian. Ảnh được lưu vào `assets/` cạnh file `.md` và chèn
+`![](assets/ten.png)`. Muốn huỷ thì bấm `Ctrl-C`: `Esc` vẫn lưu ảnh với tên mặc định.
+Cần `pngpaste` trên macOS, `xclip` hoặc `wl-clipboard` trên Linux (`install.sh` cài sẵn).
 
 > render-markdown bật sẵn khi mở file `.md`. markdown-preview chạy bằng `node` (cài dependency khi cài plugin).
 
@@ -419,6 +426,7 @@ Danh sách **class / function / method** để nhảy nhanh trong file dài — 
 | `node` | Một số LSP | — |
 | JDK 25 + JDK của project | Chạy jdtls / biên dịch | `sdk install java` |
 | `jq` | Kết quả curl.nvim | `brew install jq` |
+| `pngpaste` / `xclip` | Dán ảnh vào markdown | `brew install pngpaste` |
 | `lazydocker` | Docker (tùy chọn) | `brew install lazydocker` |
 | `psql` | Database Postgres (tùy chọn) | `brew install libpq` |
 

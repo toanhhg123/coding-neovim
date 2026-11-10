@@ -27,6 +27,13 @@ class NeovimTests(unittest.TestCase):
         for script in ("install.sh", "tmux/scripts/tmux-sessionizer"):
             subprocess.run(["bash", "-n", script], cwd=REPO, check=True)
 
+    def test_markdown_image_paste(self):
+        result = self.run_case("lua_cases.lua", "markdown_image")
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        install = (REPO / "install.sh").read_text()
+        self.assertIn("pngpaste", install)
+        self.assertIn("xclip wl-clipboard", install)
+
     def test_java_and_spring(self):
         for case in ("java_home", "java_special_files", "java_autocmd", "spring_tmux", "spring_terminal", "spring_debug_runner"):
             with self.subTest(case=case):
